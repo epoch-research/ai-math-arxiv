@@ -1,0 +1,75 @@
+{
+  "generated_at": "2026-09-08T18:30:22+00:00",
+  "pipeline_commit": "329072e7a5a3ba550304fff40e3408cd54014014",
+  "classification": {
+    "provenance": "fulltext:ai_tools.v2:tax3",
+    "model": [
+      "claude-fable-5"
+    ],
+    "verdicts": 20118,
+    "errored_verdicts": 11
+  },
+  "disclosures": {
+    "from": "2018-01",
+    "through": "2026-08",
+    "papers_examined": 319738,
+    "papers_disclosing": 3715,
+    "outcomes": {
+      "no_hit": 299616,
+      "no_disclosure": 14674,
+      "not_examined": 5884,
+      "disclosure": 3715,
+      "subject_matter": 1483,
+      "denial": 235,
+      "unresolved": 15
+    },
+    "partial_months": []
+  },
+  "authors": {
+    "history_complete_from": "1989-04",
+    "name_key": "full",
+    "panel": {
+      "window": "2019-2022",
+      "min_papers_in_field": 3,
+      "min_core_journal_papers": 5,
+      "active_from": "2023-01"
+    },
+    "n_authors": 341992,
+    "n_author_paper_links": 1741418,
+    "openalex_crosswalk": {
+      "authors_with_openalex_id": 152713,
+      "authors_with_orcid": 90486,
+      "coverage_note": "works pulled for 2018+ papers only"
+    }
+  },
+  "files": {
+    "disclosures": {
+      "path": "math_disclosures.csv",
+      "rows": 8056
+    },
+    "examined": {
+      "path": "math_examined.csv",
+      "rows": 3224
+    },
+    "papers": {
+      "path": "math_papers.csv.gz",
+      "rows": 325622
+    },
+    "authors": {
+      "path": "math_authors.csv.gz",
+      "rows": 341992
+    },
+    "author_fields": {
+      "path": "math_author_fields.csv.gz",
+      "rows": 353678
+    },
+    "author_papers": {
+      "path": "math_author_papers.csv.gz",
+      "rows": 1741418
+    },
+    "author_ids": {
+      "path": "math_author_ids.csv.gz",
+      "rows": 206600
+    }
+  }
+}

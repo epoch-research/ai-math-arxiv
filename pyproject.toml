@@ -1,0 +1,22 @@
+[project]
+name = "ai-math-arxiv"
+version = "0.1.0"
+description = "AI use in mathematics research, measured on arXiv: per-paper AI-use disclosures with verbatim quotes, and the author tables behind the panel and tenure series."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
