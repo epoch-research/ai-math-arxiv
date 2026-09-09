@@ -34,7 +34,6 @@ the rate is here.
 | `url` | str | `https://arxiv.org/abs/<arxiv_id>` |
 | `month` | str | v1 submission month |
 | `field` | str | primary category |
-| `tier` | str | `full_text` (2023 onward: the whole paper was read) or `excerpts` (2018–2022: matched passages plus acknowledgment-like sections) |
 | `tag` | str | fine use tag, one of the 19 use tags in the vocabulary below |
 | `bucket` | str | the published use-case bucket the tag rolls into: `generated`, `formalized`, `research`, `lit_review`, `writing`, `other`; empty for a `purpose_unstated` tag on a paper that has other buckets |
 | `attribution` | str | for the three Generated-the-math tags only: `explicit` (a specific result and a tool act are both named) or `vague`; empty otherwise |
@@ -72,8 +71,8 @@ paper; a missing cell means no data, never a measured zero.
 
 ## `papers` — `data/math_papers.csv.gz`
 
-One row per mathematics-primary paper listed in the covered range, with what the
-pipeline did with it. This is the table to consult for "was this paper checked at
+One row per mathematics-primary paper listed from January 2023 to the last examined
+month, with what the pipeline did with it. This is the table to consult for "was this paper checked at
 all, and what came of it".
 
 | Column | Type | Notes |
@@ -223,8 +222,8 @@ are aliases of `cs.IT` and `math-ph` on arXiv and do not occur as primaries here
 
 ## Coverage
 
-The disclosure tables run from 2018-01, when full-text coverage begins, to the
-latest month in `data/manifest.json`. The author tables cover arXiv's mathematics set
-from its first submissions (1989) to the snapshot date. Use-case buckets are
-meaningful from 2023 on; in 2018–2022 the disclosing papers number in single digits
-per year.
+The disclosure, examined and papers tables run from 2023-01 to the latest month in
+`data/manifest.json`. The pipeline measures from 2018-01, but 2018–2022 holds four
+disclosing papers in five years and was read as excerpts rather than full text, so
+the public dataset begins where the full-text tier does. The author tables cover
+arXiv's mathematics set from its first submissions (1989) to the snapshot date.

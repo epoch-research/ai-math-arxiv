@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-09T01:22:55+00:00",
+  "generated_at": "2026-09-09T01:44:22+00:00",
   "pipeline_commit": "a562a90efad9ad53353b26ef79bc7d3232d3388c",
   "classification": {
     "provenance": "fulltext:ai_tools.v2:tax3",
@@ -29,21 +29,22 @@
       "lean_proof_rate",
       "pages_per_paper"
     ],
+    "from": "2023-01",
     "through": "2026-09"
   },
   "disclosures": {
-    "from": "2018-01",
+    "from": "2023-01",
     "through": "2026-08",
-    "papers_examined": 319738,
-    "papers_disclosing": 3715,
+    "papers_examined": 152361,
+    "papers_disclosing": 3711,
     "outcomes": {
-      "no_hit": 299616,
-      "no_disclosure": 14674,
-      "not_examined": 5158,
-      "disclosure": 3715,
-      "subject_matter": 1483,
-      "denial": 235,
-      "unresolved": 15
+      "no_hit": 139194,
+      "no_disclosure": 8016,
+      "disclosure": 3711,
+      "not_examined": 2402,
+      "subject_matter": 1198,
+      "denial": 233,
+      "unresolved": 9
     },
     "partial_months": []
   },
@@ -67,19 +68,19 @@
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 83185
+      "rows": 51302
     },
     "disclosures": {
       "path": "math_disclosures.csv",
-      "rows": 8056
+      "rows": 8052
     },
     "examined": {
       "path": "math_examined.csv",
-      "rows": 3224
+      "rows": 1364
     },
     "papers": {
       "path": "math_papers.csv.gz",
-      "rows": 324896
+      "rows": 154763
     },
     "authors": {
       "path": "math_authors.csv.gz",

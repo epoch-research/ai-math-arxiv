@@ -31,7 +31,7 @@ from arxiv_math_ai_data import (
 )
 
 DISCLOSURE_COLUMNS = {
-    "arxiv_id", "url", "month", "field", "tier", "tag", "bucket", "attribution",
+    "arxiv_id", "url", "month", "field", "tag", "bucket", "attribution",
     "verifier", "quote", "tools_named", "vendors", "confidence",
 }
 EXAMINED_COLUMNS = {
@@ -63,12 +63,17 @@ def test_disclosure_columns_and_values(tables):
     assert set(df["bucket"]).issubset(BUCKETS)
     assert (df["quote"].str.len() > 0).all(), "every tag carries a quote"
     assert df["url"].str.startswith("https://arxiv.org/abs/").all()
-    assert (df["month"] >= "2018-01").all()
+    assert (df["month"] >= "2023-01").all()
 
 
 def test_examined_columns_and_all_rows(tables):
     df = tables["examined"]
     assert EXAMINED_COLUMNS.issubset(df.columns)
+    assert df["month"].min() == "2023-01"
+    assert tables["papers"]["month"].min() == "2023-01"
+    assert tables["monthly"]["period"].min() == "2023-01"
+    # author history is NOT truncated: first papers reach back before 2023
+    assert tables["authors"]["first_paper_month"].min() < "2000-01"
     assert (df["papers_examined"] <= df["papers_listed"]).all()
     assert (df["papers_disclosing"] <= df["papers_examined"]).all()
     assert (df["field"] == "all").any()
