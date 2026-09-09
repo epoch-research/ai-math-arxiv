@@ -1,6 +1,10 @@
 """AI use in mathematics research, measured on arXiv — the public dataset.
 
-Two datasets, seven tables, read from the CSV files in `data/`:
+Two datasets plus the chart series, eight tables, read from the CSV files in `data/`:
+
+  THE MONTHLY SERIES
+    monthly        the aggregate file the tracker's charts draw, one row per
+                   (metric, field, month, population, category), numerator/denominator
 
   PAPERS -> AI-USE DISCLOSURES
     disclosures    one row per (paper, use tag) with the verbatim quote behind the tag
@@ -25,6 +29,7 @@ Usage:
     get_author_papers("terence tao")                       # every paper by an author key
     get_first_paper("terence tao")                         # id, month, URL
     get_paper("2608.00377")                                # one paper's tags and quotes
+    get_monthly("ai_ack_rate", field="math.CO")            # a chart series, ready to plot
 
 Every getter reads the local `data/` directory by default. Pass `source="github"` to
 read the published files straight from the repository without cloning it, or a
@@ -48,6 +53,7 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 GITHUB_RAW = "https://raw.githubusercontent.com/epoch-research/ai-math-arxiv/main/data"
 
 FILES = {
+    "monthly": "arxiv_trends_monthly.csv",
     "disclosures": "math_disclosures.csv",
     "examined": "math_examined.csv",
     "papers": "math_papers.csv.gz",
@@ -67,8 +73,12 @@ _STRING_COLUMNS = {
     "arxiv_id", "first_paper_id", "month", "first_paper_month", "last_paper_month",
     "field", "author", "name", "quote", "orcid", "openalex_author_id", "tag", "bucket",
     "attribution", "verifier", "tools_named", "vendors", "confidence", "tier", "url",
-    "first_paper_url", "outcome",
+    "first_paper_url", "outcome", "metric", "period", "population", "category", "provenance",
 }
+
+#: The aggregate file names the math-wide aggregate `math`; the row-level tables and
+#: this module's filter arguments say `all`. `get_monthly` translates.
+MONTHLY_ALL_FIELD = "math"
 
 #: Values of `papers.outcome`, in pipeline order.
 OUTCOMES = (
@@ -138,6 +148,41 @@ def _field_mask(fields: pd.Series, field: str | None) -> pd.Series:
     if field is None or field == ALL_FIELDS:
         return pd.Series(True, index=fields.index)
     return fields == field
+
+
+# --- the monthly series ---------------------------------------------------------------
+
+
+def get_monthly(
+    metric: str | None = None,
+    field: str | None = ALL_FIELDS,
+    period: str | tuple[str, str] | None = None,
+    population: str | None = "all",
+    category: str | None = None,
+    source: str | Path | None = None,
+) -> pd.DataFrame:
+    """Rows of the chart series file: one per (metric, field, period, population, category).
+
+    Every metric is stored as `numerator` / `denominator`; the value is their ratio, and
+    rolling months up to quarters or years is summing both columns and dividing. `field`
+    defaults to the math-wide aggregate (`"all"`, stored as `"math"`); pass a category
+    such as `"math.CO"`, or None for every field. `population` is `"all"` or `"panel"`
+    (papers with an author in the field's fixed panel); None returns both. See
+    docs/monthly-series.md for the metric registry and reading rules.
+    """
+    df = load_table("monthly", source)
+    mask = _month_mask(df["period"], period)
+    if metric is not None:
+        mask &= df["metric"] == metric
+    if field is not None:
+        mask &= df["field"] == (MONTHLY_ALL_FIELD if field == ALL_FIELDS else field)
+    if population is not None:
+        mask &= df["population"] == population
+    if category is not None:
+        mask &= df["category"] == category
+    out = df[mask].reset_index(drop=True)
+    out["value"] = out["numerator"] / out["denominator"]
+    return out
 
 
 # --- papers -> disclosures ------------------------------------------------------------

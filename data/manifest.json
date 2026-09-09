@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-08T18:30:22+00:00",
-  "pipeline_commit": "329072e7a5a3ba550304fff40e3408cd54014014",
+  "generated_at": "2026-09-09T01:22:55+00:00",
+  "pipeline_commit": "a562a90efad9ad53353b26ef79bc7d3232d3388c",
   "classification": {
     "provenance": "fulltext:ai_tools.v2:tax3",
     "model": [
@@ -8,6 +8,28 @@
     ],
     "verdicts": 20118,
     "errored_verdicts": 11
+  },
+  "monthly": {
+    "metrics": [
+      "ai_ack_authors_band",
+      "ai_ack_novelty",
+      "ai_ack_purpose",
+      "ai_ack_rate",
+      "ai_ack_vendor",
+      "ai_no_use_rate",
+      "author_tenure",
+      "authors_band",
+      "authors_per_paper",
+      "fresh_author_rate",
+      "panel_adopted_rate",
+      "papers_total",
+      "total_adopted_rate"
+    ],
+    "excluded": [
+      "lean_proof_rate",
+      "pages_per_paper"
+    ],
+    "through": "2026-09"
   },
   "disclosures": {
     "from": "2018-01",
@@ -17,7 +39,7 @@
     "outcomes": {
       "no_hit": 299616,
       "no_disclosure": 14674,
-      "not_examined": 5884,
+      "not_examined": 5158,
       "disclosure": 3715,
       "subject_matter": 1483,
       "denial": 235,
@@ -43,6 +65,10 @@
     }
   },
   "files": {
+    "monthly": {
+      "path": "arxiv_trends_monthly.csv",
+      "rows": 83185
+    },
     "disclosures": {
       "path": "math_disclosures.csv",
       "rows": 8056
@@ -53,7 +79,7 @@
     },
     "papers": {
       "path": "math_papers.csv.gz",
-      "rows": 325622
+      "rows": 324896
     },
     "authors": {
       "path": "math_authors.csv.gz",

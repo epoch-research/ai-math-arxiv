@@ -23,6 +23,7 @@ from arxiv_math_ai_data import (
     get_disclosures,
     get_examined,
     get_first_paper,
+    get_monthly,
     get_paper,
     get_papers,
     normalize_arxiv_id,
@@ -224,3 +225,48 @@ def test_papers_table_reconciles_with_examined(tables):
     assert len(get_papers(month="2026-08", field="all", outcome="disclosure")) == int(
         ex[(ex["month"] == "2026-08") & (ex["field"] == "all")].papers_disclosing.iloc[0]
     )
+
+
+def test_monthly_series_loads_and_filters(tables):
+    m = tables["monthly"]
+    assert {"metric", "field", "period", "population", "category", "numerator",
+            "denominator", "is_partial", "provenance"}.issubset(m.columns)
+    assert not {"lean_proof_rate", "pages_per_paper"} & set(m["metric"])
+    co = get_monthly("ai_ack_rate", field="math.CO")
+    assert set(co["field"]) == {"math.CO"} and set(co["population"]) == {"all"}
+    assert ((co["value"] >= 0) & (co["value"] <= 1)).all()
+    everything = get_monthly("ai_ack_rate", field=None, population=None)
+    assert {"all", "panel"} <= set(everything["population"])
+
+
+def test_monthly_disclosure_rate_matches_the_examined_table():
+    """The chart series and the row-level denominators are the same numbers."""
+    rate = get_monthly("ai_ack_rate", field=None).set_index(["period", "field"])
+    ex = get_examined().set_index(["month", "field"])
+    for (period, field), row in rate.iterrows():
+        cell = ex.loc[(period, "all" if field == "math" else field)]
+        assert int(row["numerator"]) == int(cell["papers_disclosing"]), (period, field)
+        assert int(row["denominator"]) == int(cell["papers_examined"]), (period, field)
+
+
+def test_monthly_papers_total_matches_the_papers_table():
+    total = get_monthly("papers_total", field=None)
+    total = total[total["period"] <= get_papers()["month"].max()].set_index(["period", "field"])
+    ex = get_examined().set_index(["month", "field"])
+    for (period, field), row in total.iterrows():
+        listed = ex.loc[(period, "all" if field == "math" else field), "papers_listed"]
+        assert int(row["numerator"]) == int(listed), (period, field)
+
+
+def test_monthly_tenure_is_rebuildable_from_the_author_tables():
+    month = "2026-08"
+    first = get_authors().set_index("author")["first_paper_month"]
+    p = get_author_papers()
+    p = p[p["is_math_primary"] & (p["month"] == month)].drop_duplicates("author")
+    to_n = lambda m: int(m[:4]) * 12 + int(m[5:7])  # noqa: E731
+    elapsed = p["month"].map(to_n) - p["author"].map(first).map(to_n)
+    rebuilt = pd.cut(elapsed, [-1, 0, 60, 120, 10**6],
+                     labels=["debut", "years_0_5", "years_5_10", "years_10_plus"]).value_counts()
+    published = get_monthly("author_tenure", period=month).set_index("category")["numerator"]
+    for bucket, n in rebuilt.items():
+        assert int(n) == int(published[bucket]), bucket

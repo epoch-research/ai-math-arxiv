@@ -1,7 +1,8 @@
 # AI Use in Mathematics Research — arXiv Data
 
 Per-paper and per-author data behind Epoch AI's tracker of how AI is changing
-mathematical research practice, measured on arXiv. Two datasets:
+mathematical research practice, measured on arXiv, together with the monthly series
+the tracker's charts draw. Two datasets and the chart file:
 
 - **Papers → AI-use disclosures.** Every mathematics paper counted as disclosing AI
   use, from 2018 to the latest complete month, with the use-case tags assigned to it
@@ -11,9 +12,12 @@ mathematical research practice, measured on arXiv. Two datasets:
   their paper list, per-field paper counts, membership of each field's fixed author
   panel, and a crosswalk to OpenAlex author ids and ORCIDs.
 
-The tracker's charts are at <https://epoch.ai/data/arxiv>. The monthly aggregate
-series those charts draw is derived from the same pipeline; this repository is the
-row-level data underneath it.
+- **The monthly series.** The aggregate file the charts read, one row per metric,
+  field, month, population and category, stored as numerator and denominator. Every
+  series in it can be rebuilt from the two datasets above, and the tests do so for
+  the disclosure rate, the paper counts, and the career-length composition.
+
+The tracker's charts are at <https://epoch.ai/data/arxiv>.
 
 ## Usage
 
@@ -36,6 +40,14 @@ Look a paper up by arXiv id in any spelling: `2608.00377`, `2608.00377v2`,
 `no_disclosure`, `subject_matter`, `denial`, `disclosure`, or `unresolved`.
 
 ```python
+from arxiv_math_ai_data import get_monthly
+
+get_monthly("ai_ack_rate", field="math.CO")               # one chart series, with a value column
+get_monthly("ai_ack_purpose", period="2026", category="generated")
+get_monthly("author_tenure", period="2026-08")             # colour-by-career-length, one month
+```
+
+```python
 from arxiv_math_ai_data import get_authors, get_author_papers, get_first_paper, get_author_ids
 
 get_authors(field="math.CO", panel=True)   # the combinatorics panel
@@ -49,7 +61,7 @@ Or fetch everything at once, or read straight from GitHub without cloning:
 ```python
 from arxiv_math_ai_data import get_all_tables
 
-tables = get_all_tables()                  # dict of seven DataFrames
+tables = get_all_tables()                  # dict of eight DataFrames
 tables = get_all_tables(source="github")   # same, read from the raw files online
 ```
 
@@ -60,11 +72,14 @@ you the key for a display name.
 
 ## Tables
 
-See [`docs/schema.md`](docs/schema.md) for the column-level schema of every file and
-[`docs/methodology.md`](docs/methodology.md) for how the values were produced.
+See [`docs/schema.md`](docs/schema.md) for the column-level schema of the row-level
+files, [`docs/monthly-series.md`](docs/monthly-series.md) for the chart file and its
+metric registry, and [`docs/methodology.md`](docs/methodology.md) for how the values
+were produced.
 
 | Table | File | Grain | Rows | Key columns |
 |-------|------|-------|------|-------------|
+| `monthly` | `data/arxiv_trends_monthly.csv` | Metric × field × month × population × category | ~83,000 | `numerator`, `denominator`, `is_partial`, `provenance` |
 | `disclosures` | `data/math_disclosures.csv` | Paper × use tag | ~8,000 | `arxiv_id`, `month`, `field`, `tag`, `bucket`, `quote` |
 | `examined` | `data/math_examined.csv` | Month × field (+ `all`) | ~3,200 | `papers_listed`, `papers_examined`, `papers_disclosing`, `papers_denying` |
 | `papers` | `data/math_papers.csv.gz` | Listed paper | ~325,000 | `examined`, `outcome` |
@@ -82,6 +97,7 @@ A few properties of these tables are easy to get wrong.
 
 - **The disclosure rate is `papers_disclosing / papers_examined`**, from the
   `examined` table, and the `disclosures` table lists exactly those papers. The
+  `ai_ack_rate` rows of the monthly file carry the same two numbers. The
   denominator is papers whose TeX source we could read, not papers listed; the two
   differ by a few percent. Use the `field == "all"` rows for a math-wide figure; the
   field rows do not sum to it, because small fields are included here and the
@@ -122,7 +138,11 @@ makes.
 
 The pipeline runs monthly, after arXiv publishes the previous month's source
 archives. A refresh replaces the files in `data/` and updates `manifest.json`; the
-diff is the changelog. History can change on a refresh, for the reasons above.
+diff is the changelog. History can change on a refresh, for the reasons above. The
+monthly series file is the same one committed to the website with each refresh, so
+the charts and this repository describe one snapshot. Two tracker metrics are not in
+it, because nothing here can reproduce them: Lean formalization claims and pages per
+paper.
 
 ## Citation
 

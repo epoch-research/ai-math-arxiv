@@ -1,7 +1,8 @@
 # Data Schema
 
-Column-level reference for the seven tables in `data/`, as returned by
-`arxiv_math_ai_data.get_all_tables()`.
+Column-level reference for the seven row-level tables in `data/`, as returned by
+`arxiv_math_ai_data.get_all_tables()`. The eighth table, the monthly chart series,
+has its own reference in [`monthly-series.md`](monthly-series.md).
 
 ## Conventions
 
