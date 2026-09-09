@@ -152,6 +152,68 @@ the charts and this repository describe one snapshot. Two tracker metrics are no
 it, because nothing here can reproduce them: Lean formalization claims and pages per
 paper.
 
+## Uploading to Airtable
+
+The website's data hub reads this dataset from an Airtable base rather than from
+GitHub. `upload_to_airtable.py` syncs the tables there with
+[`epochutils.data.airtable`](https://github.com/epoch-research/epochutils): it
+calls `get_all_tables()`, builds one Airtable table per DataFrame, upserts every
+row on the table's primary field and prunes rows that are no longer in the
+source, so re-running it is safe. `.github/workflows/upload-airtable.yml` runs
+it on every push to `main` that touches `data/` or the uploader, on manual
+dispatch (with an optional list of tables), and once a week as a safety net.
+
+**What to configure on GitHub.** A repository secret `AIRTABLE_API_KEY` holding
+a personal access token with scopes `data.records:read`, `data.records:write`,
+`schema.bases:read` and `schema.bases:write` on the target base, and a repository
+variable `AIRTABLE_BASE_ID` with the base's `app…` id. Locally, copy
+`.env.example` to `.env` and fill in the same two values.
+
+**Table and field contract.**
+
+| Airtable table | `get_all_tables()` key | Rows | Primary field |
+|---|---|---|---|
+| `arxiv_trends_monthly` | `monthly` | ~51,000 | `Name` = `metric\|field\|period\|population\|category` |
+| `math_examined` | `examined` | ~1,400 | `Name` = `month\|field` |
+| `math_disclosures` | `disclosures` | ~8,000 | `Name` = `arxiv_id\|tag\|sha1(quote)[:8]` |
+| `math_papers` | `papers` | ~155,000 | `arxiv_id` (opt-in) |
+| `math_authors` | `authors` | ~342,000 | `author` (opt-in) |
+| `math_author_fields` | `author_fields` | ~354,000 | `Name` = `author\|field` (opt-in) |
+| `math_author_papers` | `author_papers` | ~1,740,000 | `Name` = `author\|arxiv_id` (opt-in) |
+| `math_author_ids` | `author_ids` | ~207,000 | `Name` = `author\|openalex_author_id\|orcid` (opt-in) |
+
+- Table names are the CSV file stems; field names are the CSV column names,
+  verbatim. Where a table has a single column that is unique in every row
+  (`arxiv_id` in `papers`, `author` in `authors`) that column is the primary
+  field; otherwise a `Name` field is synthesized by joining the key columns with
+  `|`. In `disclosures` the pair (`arxiv_id`, `tag`) repeats when one paper earns
+  the same tag from several quotes, so the key ends with the first eight hex
+  digits of the SHA-1 of the quote.
+- Field types: integer counts (`numerator`, `denominator`, `papers_*`, `n_*`)
+  are `number` fields with precision 0; boolean columns (`is_partial`,
+  `examined`, `panel`, `is_math_primary`) are checkboxes, stored as checked /
+  empty; every other column is single-line text, with empty strings stored as
+  empty cells. Airtable cannot change a field's type after creation, so these
+  are fixed on the first upload.
+- By default only the first three tables are uploaded (about 61,000 records).
+  Airtable caps a base at 50,000 records on Team plans, 125,000 on Business and
+  500,000 on Enterprise; the author tables (about 2.6 million rows) do not fit
+  on any plan and `math_papers` needs Enterprise. `--tables` or `--all` overrides
+  the default.
+
+**Checking locally without touching Airtable.**
+
+```bash
+uv sync
+uv run python upload_to_airtable.py --dry-run                   # default tables
+uv run python upload_to_airtable.py --dry-run --tables papers   # any table, by key or name
+```
+
+The dry run prints, for each table, the Airtable name, row count, primary
+field, duplicate- and empty-key counts and the field type every column will be
+created with, then exits without connecting. Drop `--dry-run` (with `.env`
+filled in) to upload.
+
 ## Citation
 
 > Epoch AI (2026). *AI use in mathematics research: arXiv disclosures and author

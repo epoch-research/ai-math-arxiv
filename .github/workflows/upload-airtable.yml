@@ -1,0 +1,55 @@
+name: Upload tables to Airtable
+
+on:
+  workflow_dispatch:
+    inputs:
+      tables:
+        description: "Space-separated table keys or names to upload (empty = the default set)"
+        required: false
+        default: ""
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "arxiv_math_ai_data.py"
+      - "upload_to_airtable.py"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/upload-airtable.yml"
+  schedule:
+    # The data only changes through commits (the monthly refresh lands as a PR),
+    # so the push trigger above does the real work. This weekly run is a safety
+    # net for a push run that was skipped or failed, and re-syncs a base someone
+    # edited by hand. It is not a data poll.
+    - cron: "30 6 * * 1"
+
+concurrency:
+  group: upload-airtable
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: true
+
+      - run: uv sync --locked
+
+      - name: Upload tables to Airtable
+        env:
+          AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+          AIRTABLE_BASE_ID: ${{ vars.AIRTABLE_BASE_ID }}
+          TABLES: ${{ github.event.inputs.tables }}
+        run: |
+          if [ -n "$TABLES" ]; then
+            uv run python upload_to_airtable.py --tables $TABLES
+          else
+            uv run python upload_to_airtable.py
+          fi
