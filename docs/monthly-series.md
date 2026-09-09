@@ -2,7 +2,8 @@
 
 The aggregate file the tracker's charts draw, at monthly grain. It is the same file
 the website reads, minus two metrics the row-level tables in this repository cannot
-reproduce (`lean_proof_rate`, `pages_per_paper`). Everything else in it can be
+reproduce (`lean_proof_rate`, `pages_per_paper`) and minus periods before 2023-01,
+where the public dataset begins. Everything else in it can be
 rebuilt from `disclosures`, `examined`, `papers`, `authors` and `author_papers`, and
 the test suite checks the disclosure rate, the paper counts and the tenure
 composition against them.

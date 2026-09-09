@@ -5,7 +5,7 @@ mathematical research practice, measured on arXiv, together with the monthly ser
 the tracker's charts draw. Two datasets and the chart file:
 
 - **Papers → AI-use disclosures.** Every mathematics paper counted as disclosing AI
-  use, from 2018 to the latest complete month, with the use-case tags assigned to it
+  use, from January 2023 to the latest complete month, with the use-case tags assigned to it
   and the verbatim quote from the paper that justifies each tag. Alongside it, the
   denominators: how many papers were listed and examined in each month and field.
 - **Authors.** Every author key in arXiv's mathematics set with their first paper,
@@ -79,10 +79,10 @@ were produced.
 
 | Table | File | Grain | Rows | Key columns |
 |-------|------|-------|------|-------------|
-| `monthly` | `data/arxiv_trends_monthly.csv` | Metric × field × month × population × category | ~83,000 | `numerator`, `denominator`, `is_partial`, `provenance` |
+| `monthly` | `data/arxiv_trends_monthly.csv` | Metric × field × month × population × category | ~50,000 | `numerator`, `denominator`, `is_partial`, `provenance` |
 | `disclosures` | `data/math_disclosures.csv` | Paper × use tag | ~8,000 | `arxiv_id`, `month`, `field`, `tag`, `bucket`, `quote` |
 | `examined` | `data/math_examined.csv` | Month × field (+ `all`) | ~3,200 | `papers_listed`, `papers_examined`, `papers_disclosing`, `papers_denying` |
-| `papers` | `data/math_papers.csv.gz` | Listed paper | ~325,000 | `examined`, `outcome` |
+| `papers` | `data/math_papers.csv.gz` | Listed paper | ~160,000 | `examined`, `outcome` |
 | `authors` | `data/math_authors.csv.gz` | Author key | ~342,000 | `name`, `first_paper_id`, `first_paper_month`, `n_papers` |
 | `author_fields` | `data/math_author_fields.csv.gz` | Author × math field | ~354,000 | `n_papers_in_field`, `n_papers_2019_2022`, `panel` |
 | `author_papers` | `data/math_author_papers.csv.gz` | Author × paper | ~1,740,000 | `arxiv_id`, `month`, `field`, `is_math_primary` |
@@ -124,6 +124,14 @@ A few properties of these tables are easy to get wrong.
   core-journal papers in OpenAlex, and at least one further mathematics paper from
   2023 on. It exists so that a change in output can be read as a change in what the
   same people did, and nothing more.
+
+## Coverage
+
+The paper-level tables and the monthly series begin in **January 2023**. The pipeline
+measures from 2018, but 2018–2022 holds four disclosing papers in five years and was
+read as excerpts rather than full text, so the public dataset starts where the
+full-text tier does. The author tables keep the full history of arXiv mathematics
+from 1989, because first papers and career lengths depend on it.
 
 ## What is deliberately absent
 

@@ -22,7 +22,8 @@ by its **first-version submission month**, never by announcement or revision dat
 A paper's field is its **primary** category; cross-lists are not double-counted.
 
 TeX source is pulled from arXiv's bulk source archives for every mathematics-primary
-paper from 2018-01 on. Source that is PDF-only or fails to parse (about 2% of papers)
+paper from 2018-01 on. The public tables begin in 2023-01: 2018–2022 was measured
+(four disclosing papers in five years) but is not published here. Source that is PDF-only or fails to parse (about 2% of papers)
 is not examined, and those papers are excluded from the denominator rather than
 counted as non-disclosing. The `examined` table carries both counts.
 

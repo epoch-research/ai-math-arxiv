@@ -72,7 +72,7 @@ ALL_FIELDS = "all"
 _STRING_COLUMNS = {
     "arxiv_id", "first_paper_id", "month", "first_paper_month", "last_paper_month",
     "field", "author", "name", "quote", "orcid", "openalex_author_id", "tag", "bucket",
-    "attribution", "verifier", "tools_named", "vendors", "confidence", "tier", "url",
+    "attribution", "verifier", "tools_named", "vendors", "confidence", "url",
     "first_paper_url", "outcome", "metric", "period", "population", "category", "provenance",
 }
 
@@ -304,7 +304,6 @@ def get_paper(arxiv_id: str, source: str | Path | None = None) -> dict[str, obje
         return out
     first = rows.iloc[0]
     return out | {
-        "tier": str(first["tier"]),
         "buckets": sorted(set(rows["bucket"]) - {""}),
         "tags": [
             {"tag": r.tag, "bucket": r.bucket, "attribution": r.attribution,
