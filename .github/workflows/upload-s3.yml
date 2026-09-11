@@ -1,13 +1,5 @@
 name: Upload data to S3
 
-# Publishes the committed tables under data/ to the datahub S3 bucket, where the
-# website's data pipeline (epoch-website-astro, scripts/datahub) reads the monthly
-# series from. Same shape as epoch-research/edu-test: OIDC role, no AWS keys.
-#
-# Keys: <repo-name>/<file> for every file in data/, plus <repo-name>/
-# arxiv_trends_monthly.csv.gz — the gzipped copy of the monthly series that the
-# website serves at /data/arxiv_trends_monthly.csv.gz.
-
 on:
   push:
     branches: [main]
@@ -30,8 +22,6 @@ jobs:
       contents: read
       id-token: write
     env:
-      # Organization variables (see README, "Publishing to S3"); repository variables
-      # with the same names override them.
       AWS_ACCOUNT_ID: ${{ vars.DATAHUB_UPDATE_AWS_ACCOUNT_ID }}
       AWS_REGION: ${{ vars.DATAHUB_UPDATE_AWS_REGION }}
       S3_BUCKET: ${{ vars.DATAHUB_UPDATE_S3_BUCKET }}
