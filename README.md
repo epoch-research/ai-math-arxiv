@@ -147,21 +147,10 @@ makes.
 The pipeline runs monthly, after arXiv publishes the previous month's source
 archives. A refresh replaces the files in `data/` and updates `manifest.json`; the
 diff is the changelog. History can change on a refresh, for the reasons above. The
-monthly series file is the one the website's charts read (see "Publishing to S3"
-below), so the charts and this repository describe one snapshot. Two tracker metrics are not in
+monthly series file is the one the website's charts read, so the charts and this
+repository describe one snapshot. Two tracker metrics are not in
 it, because nothing here can reproduce them: Lean formalization claims and pages per
 paper.
-
-## Publishing to S3
-
-Every push to `main` that touches `data/` runs
-[`.github/workflows/upload-s3.yml`](.github/workflows/upload-s3.yml), which copies the
-files in `data/` as they are to the datahub S3 bucket under the `ai-math-arxiv/` prefix
-(`ai-math-arxiv/<file name>`). The website's data pipeline
-([epoch-website-astro](https://github.com/epoch-research/epoch-website-astro),
-`scripts/datahub/update_arxiv_databases.py`) fetches the monthly series from there on
-its hourly run and compresses what it serves itself. The workflow can also be run by
-hand from the Actions tab.
 
 ## Citation
 
