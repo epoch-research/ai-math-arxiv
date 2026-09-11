@@ -147,10 +147,30 @@ makes.
 The pipeline runs monthly, after arXiv publishes the previous month's source
 archives. A refresh replaces the files in `data/` and updates `manifest.json`; the
 diff is the changelog. History can change on a refresh, for the reasons above. The
-monthly series file is the same one committed to the website with each refresh, so
-the charts and this repository describe one snapshot. Two tracker metrics are not in
+monthly series file is the one the website's charts read (see "Publishing to S3"
+below), so the charts and this repository describe one snapshot. Two tracker metrics are not in
 it, because nothing here can reproduce them: Lean formalization claims and pages per
 paper.
+
+## Publishing to S3
+
+Every push to `main` that touches `data/` runs
+[`.github/workflows/upload-s3.yml`](.github/workflows/upload-s3.yml), which copies the
+files in `data/` to the datahub S3 bucket under the `ai-math-arxiv/` prefix, plus a
+gzipped copy of the monthly series, `ai-math-arxiv/arxiv_trends_monthly.csv.gz`. That
+gzipped file is what the website's data pipeline
+([epoch-website-astro](https://github.com/epoch-research/epoch-website-astro),
+`scripts/datahub/update_arxiv_databases.py`) fetches on its hourly run and serves at
+<https://epoch.ai/data/arxiv_trends_monthly.csv.gz>. The workflow can also be run by hand
+from the Actions tab.
+
+Authentication is GitHub's OIDC, no AWS keys: the job assumes the IAM role
+`epoch-gh-actions-datahub-ai-math-arxiv`, which must trust this repository's `main`
+branch and allow `s3:PutObject` on `arn:aws:s3:::<bucket>/ai-math-arxiv/*`. The account,
+region and bucket come from the organization variables `DATAHUB_UPDATE_AWS_ACCOUNT_ID`,
+`DATAHUB_UPDATE_AWS_REGION` and `DATAHUB_UPDATE_S3_BUCKET`, which have to be shared with
+this repository (epoch-research → Settings → Secrets and variables → Actions →
+Variables → Selected repositories).
 
 ## Citation
 

@@ -1,0 +1,80 @@
+name: Upload data to S3
+
+# Publishes the committed tables under data/ to the datahub S3 bucket, where the
+# website's data pipeline (epoch-website-astro, scripts/datahub) reads the monthly
+# series from. Same shape as epoch-research/edu-test: OIDC role, no AWS keys.
+#
+# Keys: <repo-name>/<file> for every file in data/, plus <repo-name>/
+# arxiv_trends_monthly.csv.gz — the gzipped copy of the monthly series that the
+# website serves at /data/arxiv_trends_monthly.csv.gz.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - '.github/workflows/upload-s3.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: upload-s3
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      # Organization variables (see README, "Publishing to S3"); repository variables
+      # with the same names override them.
+      AWS_ACCOUNT_ID: ${{ vars.DATAHUB_UPDATE_AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ vars.DATAHUB_UPDATE_AWS_REGION }}
+      S3_BUCKET: ${{ vars.DATAHUB_UPDATE_S3_BUCKET }}
+      S3_PREFIX: ${{ github.event.repository.name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to AWS with OIDC
+        uses: aws-actions/configure-aws-credentials@v6.2.4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/epoch-gh-actions-datahub-${{ github.event.repository.name }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload data files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # The website reads the monthly series gzipped; -n keeps the archive
+          # byte-identical across runs for the same input.
+          gzip -9 -n -c data/arxiv_trends_monthly.csv > "$RUNNER_TEMP/arxiv_trends_monthly.csv.gz"
+
+          upload() {
+            local file="$1"
+            local key="$S3_PREFIX/$(basename "$file")"
+            local content_type
+            case "$file" in
+              *.csv.gz) content_type='application/gzip' ;;
+              *.csv)    content_type='text/csv' ;;
+              *.json)   content_type='application/json' ;;
+              *)        content_type='application/octet-stream' ;;
+            esac
+            aws s3api put-object \
+              --bucket "$S3_BUCKET" \
+              --key "$key" \
+              --body "$file" \
+              --content-type "$content_type" > /dev/null
+            printf -- '- `s3://%s/%s` (%s bytes)\n' "$S3_BUCKET" "$key" "$(stat -c %s "$file")" >> "$GITHUB_STEP_SUMMARY"
+          }
+
+          echo '## Uploaded to S3' >> "$GITHUB_STEP_SUMMARY"
+          for file in data/*; do
+            upload "$file"
+          done
+          upload "$RUNNER_TEMP/arxiv_trends_monthly.csv.gz"
