@@ -38,28 +38,4 @@ jobs:
 
       - name: Upload data files
         shell: bash
-        run: |
-          set -euo pipefail
-
-          upload() {
-            local file="$1"
-            local key="$S3_PREFIX/$(basename "$file")"
-            local content_type
-            case "$file" in
-              *.csv.gz) content_type='application/gzip' ;;
-              *.csv)    content_type='text/csv' ;;
-              *.json)   content_type='application/json' ;;
-              *)        content_type='application/octet-stream' ;;
-            esac
-            aws s3api put-object \
-              --bucket "$S3_BUCKET" \
-              --key "$key" \
-              --body "$file" \
-              --content-type "$content_type" > /dev/null
-            printf -- '- `s3://%s/%s` (%s bytes)\n' "$S3_BUCKET" "$key" "$(stat -c %s "$file")" >> "$GITHUB_STEP_SUMMARY"
-          }
-
-          echo '## Uploaded to S3' >> "$GITHUB_STEP_SUMMARY"
-          for file in data/*; do
-            upload "$file"
-          done
+        run: aws s3 cp data/ "s3://$S3_BUCKET/$S3_PREFIX/" --recursive

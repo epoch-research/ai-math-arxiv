@@ -163,14 +163,6 @@ files in `data/` as they are to the datahub S3 bucket under the `ai-math-arxiv/`
 its hourly run and compresses what it serves itself. The workflow can also be run by
 hand from the Actions tab.
 
-Authentication is GitHub's OIDC, no AWS keys: the job assumes the IAM role
-`epoch-gh-actions-datahub-ai-math-arxiv`, which must trust this repository's `main`
-branch and allow `s3:PutObject` on `arn:aws:s3:::<bucket>/ai-math-arxiv/*`. The account,
-region and bucket come from the organization variables `DATAHUB_UPDATE_AWS_ACCOUNT_ID`,
-`DATAHUB_UPDATE_AWS_REGION` and `DATAHUB_UPDATE_S3_BUCKET`, which have to be shared with
-this repository (epoch-research → Settings → Secrets and variables → Actions →
-Variables → Selected repositories).
-
 ## Citation
 
 > Epoch AI (2026). *AI use in mathematics research: arXiv disclosures and author
