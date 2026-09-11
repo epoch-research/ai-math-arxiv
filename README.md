@@ -156,13 +156,12 @@ paper.
 
 Every push to `main` that touches `data/` runs
 [`.github/workflows/upload-s3.yml`](.github/workflows/upload-s3.yml), which copies the
-files in `data/` to the datahub S3 bucket under the `ai-math-arxiv/` prefix, plus a
-gzipped copy of the monthly series, `ai-math-arxiv/arxiv_trends_monthly.csv.gz`. That
-gzipped file is what the website's data pipeline
+files in `data/` as they are to the datahub S3 bucket under the `ai-math-arxiv/` prefix
+(`ai-math-arxiv/<file name>`). The website's data pipeline
 ([epoch-website-astro](https://github.com/epoch-research/epoch-website-astro),
-`scripts/datahub/update_arxiv_databases.py`) fetches on its hourly run and serves at
-<https://epoch.ai/data/arxiv_trends_monthly.csv.gz>. The workflow can also be run by hand
-from the Actions tab.
+`scripts/datahub/update_arxiv_databases.py`) fetches the monthly series from there on
+its hourly run and compresses what it serves itself. The workflow can also be run by
+hand from the Actions tab.
 
 Authentication is GitHub's OIDC, no AWS keys: the job assumes the IAM role
 `epoch-gh-actions-datahub-ai-math-arxiv`, which must trust this repository's `main`

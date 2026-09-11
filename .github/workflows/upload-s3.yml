@@ -41,10 +41,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          # The website reads the monthly series gzipped; -n keeps the archive
-          # byte-identical across runs for the same input.
-          gzip -9 -n -c data/arxiv_trends_monthly.csv > "$RUNNER_TEMP/arxiv_trends_monthly.csv.gz"
-
           upload() {
             local file="$1"
             local key="$S3_PREFIX/$(basename "$file")"
@@ -67,4 +63,3 @@ jobs:
           for file in data/*; do
             upload "$file"
           done
-          upload "$RUNNER_TEMP/arxiv_trends_monthly.csv.gz"
