@@ -26,13 +26,14 @@ from arxiv_math_ai_data import (
     get_monthly,
     get_paper,
     get_papers,
+    get_tools,
     normalize_arxiv_id,
     normalize_author,
 )
 
 DISCLOSURE_COLUMNS = {
-    "arxiv_id", "url", "month", "field", "tag", "bucket", "attribution",
-    "verifier", "quote", "tools_named", "vendors", "confidence",
+    "arxiv_id", "url", "month", "field", "tag", "bucket", "second_reader",
+    "quote", "tools_named", "vendors", "confidence",
 }
 EXAMINED_COLUMNS = {
     "month", "field", "papers_listed", "papers_examined", "papers_disclosing",
@@ -42,7 +43,10 @@ AUTHOR_COLUMNS = {
     "author", "name", "first_paper_id", "first_paper_month", "first_paper_url",
     "last_paper_month", "n_papers", "n_papers_math_primary",
 }
-BUCKETS = {"generated", "formalized", "research", "lit_review", "writing", "other", ""}
+BUCKETS = {
+    "substantial_research", "research_assistance", "formalized", "writing", "lit_review", "",
+}
+SECOND_READER = {"reread_confirmed", "pair_supported"}
 
 
 @pytest.fixture(scope="module")
@@ -61,6 +65,11 @@ def test_disclosure_columns_and_values(tables):
     df = tables["disclosures"]
     assert DISCLOSURE_COLUMNS.issubset(df.columns)
     assert set(df["bucket"]).issubset(BUCKETS)
+    assert set(df["second_reader"]) == SECOND_READER, "every listed tag was backed one way"
+    assert set(df["confidence"]) <= {"high", "medium", "low"}
+    # the two research rungs are mutually exclusive per paper
+    rungs = df[df["bucket"].isin(["substantial_research", "research_assistance"])]
+    assert (rungs.groupby("arxiv_id")["bucket"].nunique() == 1).all()
     assert (df["quote"].str.len() > 0).all(), "every tag carries a quote"
     assert df["url"].str.startswith("https://arxiv.org/abs/").all()
     assert (df["month"] >= "2023-01").all()
@@ -99,7 +108,7 @@ def test_month_and_field_filters():
     assert year["month"].str.startswith("2025").all()
     span = get_disclosures(month=("2024-01", "2024-06"))
     assert span["month"].between("2024-01", "2024-06").all()
-    assert len(get_disclosures(bucket="generated")) > 0
+    assert len(get_disclosures(bucket="substantial_research")) > 0
     assert set(get_disclosures(tag="writing_polish")["tag"]) == {"writing_polish"}
 
 
@@ -198,8 +207,33 @@ def test_get_paper(tables):
     assert paper["outcome"] == "disclosure" and paper["examined"] is True
     assert len(paper["tags"]) == len(get_disclosures(arxiv_id=some))
     assert all(t["quote"] for t in paper["tags"])
+    assert all(t["second_reader"] in SECOND_READER for t in paper["tags"])
+    assert "confidence" not in paper, "confidence is per tag under v4, not per paper"
+    assert len(paper["tools"]) == len(get_tools(arxiv_id=some))
+    assert all(t["quote"] for t in paper["tools"]), "every tool carries its receipt"
     assert set(paper["buckets"]) == set(get_disclosures(arxiv_id=some)["bucket"]) - {""}
     assert get_paper("0000.00000") is None
+
+
+def test_tools_table_is_the_receipt_behind_the_vendors(tables):
+    """A paper's `vendors` recomputes from its tool rows: the non-empty, non-unnamed
+    vendors, else `unnamed`. Every tool row has a verbatim sentence."""
+    t, d = tables["tools"], tables["disclosures"]
+    assert {"arxiv_id", "url", "month", "field", "tool", "vendor", "quote"} <= set(t.columns)
+    assert (t["quote"].str.len() > 0).all()
+    assert (t["tool"].str.len() > 0).all()
+    assert set(t["arxiv_id"]) <= set(d["arxiv_id"])
+    by_paper = t.groupby("arxiv_id")["vendor"].apply(
+        lambda s: "; ".join(sorted({v for v in s if v and v != "unnamed"})) or "unnamed"
+    )
+    per_paper = d.drop_duplicates("arxiv_id").set_index("arxiv_id")["vendors"]
+    for arxiv_id, vendors in per_paper.items():
+        assert by_paper.get(arxiv_id, "unnamed") == vendors, arxiv_id
+    # filters
+    anthropic = get_tools(vendor="anthropic", month="2026")
+    assert set(anthropic["vendor"]) == {"anthropic"} and anthropic["month"].str.startswith("2026").all()
+    one = get_tools(tool=t.iloc[0]["tool"])
+    assert set(one["tool"]) == {t.iloc[0]["tool"]}
 
 
 def test_get_paper_answers_was_it_checked(tables):

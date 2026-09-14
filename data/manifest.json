@@ -1,13 +1,116 @@
 {
-  "generated_at": "2026-09-09T01:44:22+00:00",
-  "pipeline_commit": "a562a90efad9ad53353b26ef79bc7d3232d3388c",
+  "generated_at": "2026-09-14T19:03:09+00:00",
+  "pipeline_commit": "9226c326c9ab465e017bcf68e9ed1adf67039297",
   "classification": {
-    "provenance": "fulltext:ai_tools.v2:tax3",
-    "model": [
-      "claude-fable-5"
+    "provenance": "fulltext:ai_tools.v3:tax4:sol+fable",
+    "first_reader": [
+      "gpt-5.6-sol"
     ],
-    "verdicts": 20118,
-    "errored_verdicts": 11
+    "second_reader": "claude-fable-5",
+    "verdicts": 15513,
+    "errored_verdicts": 0,
+    "reread_papers": 2144,
+    "series_threshold": 0.1,
+    "series_under_threshold": [
+      "ai_generated_content_embedded",
+      "draft_text_generated",
+      "figures_media",
+      "literature_search",
+      "translation",
+      "writing_polish"
+    ],
+    "bucket_by_tag": {
+      "draft_text_generated": "writing",
+      "literature_search": "lit_review",
+      "translation": "writing",
+      "writing_polish": "writing"
+    },
+    "series_qc": {
+      "ai_as_instrument": {
+        "pairs": 576,
+        "unsupported": 419
+      },
+      "ai_generated_content_embedded": {
+        "pairs": 111,
+        "unsupported": 4
+      },
+      "benchmarked_own_problem": {
+        "pairs": 415,
+        "unsupported": 214
+      },
+      "code_computation": {
+        "pairs": 1999,
+        "unsupported": 847
+      },
+      "draft_feedback": {
+        "pairs": 215,
+        "unsupported": 39
+      },
+      "draft_text_generated": {
+        "pairs": 456,
+        "unsupported": 7
+      },
+      "figures_media": {
+        "pairs": 270,
+        "unsupported": 25
+      },
+      "literature_search": {
+        "pairs": 596,
+        "unsupported": 32
+      },
+      "math_checking": {
+        "pairs": 995,
+        "unsupported": 184
+      },
+      "name_collision": {
+        "pairs": 5716,
+        "unsupported": 97
+      },
+      "new:definition_generated": {
+        "pairs": 1,
+        "unsupported": 0
+      },
+      "new:proof_assistant_formalization": {
+        "pairs": 1,
+        "unsupported": 0
+      },
+      "new:research_problem_selection": {
+        "pairs": 1,
+        "unsupported": 0
+      },
+      "no_use_declared": {
+        "pairs": 262,
+        "unsupported": 5
+      },
+      "notes_organization": {
+        "pairs": 167,
+        "unsupported": 108
+      },
+      "other": {
+        "pairs": 237,
+        "unsupported": 160
+      },
+      "passing_mention": {
+        "pairs": 2678,
+        "unsupported": 277
+      },
+      "purpose_unstated": {
+        "pairs": 95,
+        "unsupported": 12
+      },
+      "subject_matter": {
+        "pairs": 1793,
+        "unsupported": 162
+      },
+      "translation": {
+        "pairs": 49,
+        "unsupported": 2
+      },
+      "writing_polish": {
+        "pairs": 2480,
+        "unsupported": 23
+      }
+    }
   },
   "monthly": {
     "metrics": [
@@ -36,15 +139,16 @@
     "from": "2023-01",
     "through": "2026-08",
     "papers_examined": 152361,
-    "papers_disclosing": 3711,
+    "papers_disclosing": 4130,
+    "tools_listed": 6242,
+    "tools_dropped_unverified_receipt": 33,
     "outcomes": {
-      "no_hit": 139194,
-      "no_disclosure": 8016,
-      "disclosure": 3711,
+      "no_hit": 136848,
+      "no_disclosure": 9618,
+      "disclosure": 4130,
       "not_examined": 2402,
-      "subject_matter": 1198,
-      "denial": 233,
-      "unresolved": 9
+      "subject_matter": 1541,
+      "denial": 224
     },
     "partial_months": []
   },
@@ -68,11 +172,11 @@
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 51302
+      "rows": 49630
     },
     "disclosures": {
       "path": "math_disclosures.csv",
-      "rows": 8052
+      "rows": 9087
     },
     "examined": {
       "path": "math_examined.csv",
@@ -81,6 +185,10 @@
     "papers": {
       "path": "math_papers.csv.gz",
       "rows": 154763
+    },
+    "tools": {
+      "path": "math_tools.csv",
+      "rows": 6242
     },
     "authors": {
       "path": "math_authors.csv.gz",

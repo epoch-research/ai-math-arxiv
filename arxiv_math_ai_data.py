@@ -12,6 +12,8 @@ Two datasets plus the chart series, eight tables, read from the CSV files in `da
     papers         one row per listed paper with its outcome (was it checked, and what
                    came of it): not_examined / no_hit / no_disclosure / subject_matter /
                    denial / disclosure / unresolved
+    tools          one row per (disclosing paper, credited tool): the tool verbatim, the
+                   vendor it maps to, and the sentence in the paper crediting it
 
   AUTHORS
     authors        one row per author key: display name, first paper, paper counts
@@ -29,6 +31,7 @@ Usage:
     get_author_papers("terence tao")                       # every paper by an author key
     get_first_paper("terence tao")                         # id, month, URL
     get_paper("2608.00377")                                # one paper's tags and quotes
+    get_tools(vendor="anthropic", month="2026")            # tool receipts behind a vendor
     get_monthly("ai_ack_rate", field="math.CO")            # a chart series, ready to plot
 
 Every getter reads the local `data/` directory by default. Pass `source="github"` to
@@ -57,6 +60,7 @@ FILES = {
     "disclosures": "math_disclosures.csv",
     "examined": "math_examined.csv",
     "papers": "math_papers.csv.gz",
+    "tools": "math_tools.csv",
     "authors": "math_authors.csv.gz",
     "author_fields": "math_author_fields.csv.gz",
     "author_papers": "math_author_papers.csv.gz",
@@ -72,7 +76,7 @@ ALL_FIELDS = "all"
 _STRING_COLUMNS = {
     "arxiv_id", "first_paper_id", "month", "first_paper_month", "last_paper_month",
     "field", "author", "name", "quote", "orcid", "openalex_author_id", "tag", "bucket",
-    "attribution", "verifier", "tools_named", "vendors", "confidence", "url",
+    "second_reader", "tools_named", "vendors", "confidence", "url", "tool", "vendor",
     "first_paper_url", "outcome", "metric", "period", "population", "category", "provenance",
 }
 
@@ -84,10 +88,10 @@ MONTHLY_ALL_FIELD = "math"
 OUTCOMES = (
     "not_examined",   # no parseable TeX source; not in any denominator
     "no_hit",         # examined; no AI-related keyword matched, so never read by the model
-    "no_disclosure",  # read; no disclosure in the rendered text
-    "subject_matter", # the paper is about AI; excluded from every disclosure series
+    "no_disclosure",  # read; no use of AI counted in the rendered text
+    "subject_matter", # the paper is about AI, and no use of AI in producing it was counted
     "denial",         # explicitly states no AI was used
-    "disclosure",     # counted as disclosing; has rows in `disclosures`
+    "disclosure",     # counted as acknowledging AI use; has rows in `disclosures`
     "unresolved",     # keyword hit, but no verdict (request errored or source not re-extracted)
 )
 
@@ -237,8 +241,9 @@ def get_disclosing_papers(
 ) -> pd.DataFrame:
     """One row per disclosing paper, with its tags, buckets, and quotes aggregated.
 
-    `tags` and `buckets` are `;`-joined sorted sets; `quotes` joins each quote with
-    ` | `. Use `get_disclosures` for one row per tag.
+    `tags`, `buckets` and `confidence` are `;`-joined sorted sets (confidence is per
+    tag, so a paper with one plain and one hedged tag reads `high; medium`); `quotes`
+    joins each quote with ` | `. Use `get_disclosures` for one row per tag.
     """
     rows = get_disclosures(month=month, field=field, arxiv_id=arxiv_id, source=source)
     if rows.empty:
@@ -253,7 +258,7 @@ def get_disclosing_papers(
         quotes=("quote", lambda s: " | ".join(s)),
         tools_named=("tools_named", "first"),
         vendors=("vendors", "first"),
-        confidence=("confidence", "first"),
+        confidence=("confidence", lambda s: "; ".join(sorted(set(s) - {""}))),
     ).reset_index()
     return out.sort_values(["month", "field", "arxiv_id"]).reset_index(drop=True)
 
@@ -279,13 +284,42 @@ def get_papers(
     return df[mask].reset_index(drop=True)
 
 
+def get_tools(
+    arxiv_id: str | list[str] | None = None,
+    vendor: str | None = None,
+    tool: str | None = None,
+    month: str | tuple[str, str] | None = None,
+    field: str | None = ALL_FIELDS,
+    source: str | Path | None = None,
+) -> pd.DataFrame:
+    """The receipts behind the vendor series: one row per (disclosing paper, credited
+    tool), with the tool spelled as the paper spells it, the vendor category it maps to,
+    and the verbatim sentence crediting it.
+
+    `vendor` is a contract vendor id (`openai`, `anthropic`, ...), `unnamed` for a
+    generic phrase such as "an LLM", or `""` for a credited tool that is not an AI
+    vendor (Lean, Grammarly). `tool` matches the verbatim spelling exactly. A paper's
+    `vendors` in `disclosures` is the set of non-empty, non-`unnamed` vendors of its
+    rows here, or `unnamed` if there are none.
+    """
+    df = load_table("tools", source)
+    mask = _month_mask(df["month"], month) & _field_mask(df["field"], field)
+    mask &= _id_mask(df["arxiv_id"], arxiv_id)
+    if vendor is not None:
+        mask &= df["vendor"] == vendor
+    if tool is not None:
+        mask &= df["tool"] == tool
+    return df[mask].reset_index(drop=True)
+
+
 def get_paper(arxiv_id: str, source: str | Path | None = None) -> dict[str, object] | None:
     """Everything published about one paper.
 
     Always includes the paper's `outcome` (see OUTCOMES). For a disclosing paper it
-    also carries the tags with their quotes, the buckets, tools and vendors. Returns
-    None only when the id is not a listed mathematics-primary paper in the covered
-    range at all.
+    also carries the tags with their quotes, how the second reader backed each one,
+    the tagger's per-tag confidence, the buckets, the vendors, and under `tools` each
+    credited tool with the sentence crediting it. Returns None only when the id is not
+    a listed mathematics-primary paper in the covered range at all.
     """
     listed = get_papers(arxiv_id=arxiv_id, field=None, source=source)
     if listed.empty:
@@ -306,13 +340,15 @@ def get_paper(arxiv_id: str, source: str | Path | None = None) -> dict[str, obje
     return out | {
         "buckets": sorted(set(rows["bucket"]) - {""}),
         "tags": [
-            {"tag": r.tag, "bucket": r.bucket, "attribution": r.attribution,
-             "verifier": r.verifier, "quote": r.quote}
+            {"tag": r.tag, "bucket": r.bucket, "second_reader": r.second_reader,
+             "confidence": r.confidence, "quote": r.quote}
             for r in rows.itertuples()
         ],
-        "tools_named": [t for t in str(first["tools_named"]).split("; ") if t],
+        "tools": [
+            {"tool": r.tool, "vendor": r.vendor, "quote": r.quote}
+            for r in get_tools(arxiv_id=arxiv_id, field=None, source=source).itertuples()
+        ],
         "vendors": [v for v in str(first["vendors"]).split("; ") if v],
-        "confidence": str(first["confidence"]),
     }
 
 
