@@ -43,9 +43,15 @@ AUTHOR_COLUMNS = {
     "author", "name", "first_paper_id", "first_paper_month", "first_paper_url",
     "last_paper_month", "n_papers", "n_papers_math_primary",
 }
-BUCKETS = {
-    "substantial_research", "research_assistance", "formalized", "writing", "lit_review", "",
-}
+#: Multi-label series the tracker page draws one line per category from. Each category of
+#: one of these shares the cell's denominator, so a category with no row for a month is a
+#: hidden zero, not an undefined rate — and a consumer bucketing by quarter would silently
+#: drop that whole quarter. `ai_ack_authors_band` and `ai_ack_novelty` are deliberately NOT
+#: here: their denominator is the band's own papers, which can genuinely be zero.
+DENSE_MULTI_LABEL = (
+    "ai_ack_purpose", "ai_ack_vendor", "ai_ack_vendor_group",
+    "author_adopted_group", "author_adopted_vendor", "author_adopted_vendor_group",
+)
 SECOND_READER = {"reread_confirmed", "pair_supported"}
 
 
@@ -62,9 +68,18 @@ def test_get_all_tables_returns_every_file(tables):
 
 
 def test_disclosure_columns_and_values(tables):
+    """`bucket` is checked against the published series rather than a hard-coded list:
+    which buckets exist is itself a result of the classification run, so a list written
+    here would have to be edited every version and would fail for the wrong reason."""
     df = tables["disclosures"]
     assert DISCLOSURE_COLUMNS.issubset(df.columns)
-    assert set(df["bucket"]).issubset(BUCKETS)
+    monthly = tables["monthly"]
+    published = set(monthly.loc[monthly["metric"] == "ai_ack_purpose", "category"])
+    assert len(published) > 0, "no use-case series in the monthly file"
+    # "" is a paper counted in the acknowledgement rate whose tags all sit in series that
+    # did not clear the two-reader bar.
+    assert set(df["bucket"]) <= published | {""}
+    assert published <= set(df["bucket"]), "a published series with no per-paper rows"
     assert set(df["second_reader"]) == SECOND_READER, "every listed tag was backed one way"
     assert set(df["confidence"]) <= {"high", "medium", "low"}
     # the two research rungs are mutually exclusive per paper
@@ -256,11 +271,15 @@ def test_papers_table_reconciles_with_examined(tables):
     listed = by_cell.size()
     examined = by_cell["examined"].sum()
     disclosing = by_cell["outcome"].apply(lambda s: int((s == "disclosure").sum()))
+    # A paper can be about AI and also state it used none; `papers_denying` counts it, so
+    # the outcome column has to as well.
+    denying = by_cell["outcome"].apply(lambda s: int((s == "denial").sum()))
     for row in ex[ex["field"] != "all"].itertuples():
         key = (row.month, row.field)
         assert int(listed[key]) == int(row.papers_listed), key
         assert int(examined[key]) == int(row.papers_examined), key
         assert int(disclosing[key]) == int(row.papers_disclosing), key
+        assert int(denying[key]) == int(row.papers_denying), key
     assert len(get_papers(month="2026-08", field="all", outcome="disclosure")) == int(
         ex[(ex["month"] == "2026-08") & (ex["field"] == "all")].papers_disclosing.iloc[0]
     )
@@ -309,3 +328,85 @@ def test_monthly_tenure_is_rebuildable_from_the_author_tables():
     published = get_monthly("author_tenure", period=month).set_index("category")["numerator"]
     for bucket, n in rebuilt.items():
         assert int(n) == int(published[bucket]), bucket
+
+
+def test_multi_label_series_are_dense_in_every_cell(tables):
+    """Every category of a shared-denominator series appears in every period that series
+    covers.
+
+    A consumer that buckets months into quarters keeps a quarter only when all three of
+    its months are present FOR THAT CATEGORY. So a category emitted only in the months it
+    was non-zero loses whole quarters from its line, with no error anywhere: the line just
+    gets shorter. Publishing the zero row is what keeps a measured zero distinguishable
+    from an absent one.
+    """
+    m = tables["monthly"]
+    for metric in DENSE_MULTI_LABEL:
+        rows = m[m["metric"] == metric]
+        assert len(rows) > 0, f"{metric} is missing from the monthly series"
+        for (field, population), cell in rows.groupby(["field", "population"]):
+            periods = set(cell["period"])
+            per_category = cell.groupby("category")["period"].apply(set)
+            for category, got in per_category.items():
+                missing = sorted(periods - got)
+                assert not missing, (metric, field, population, category, missing[:3])
+            # one denominator per period, shared by every category
+            assert (cell.groupby("period")["denominator"].nunique() == 1).all(), (
+                metric, field, population
+            )
+
+
+def test_use_case_and_vendor_series_agree_with_the_per_paper_tables(tables):
+    """The chart lines and the per-paper rows count the same papers.
+
+    `ai_ack_purpose` counts papers per bucket; `ai_ack_vendor` counts papers per vendor,
+    where `unnamed` means the paper named no vendor at all and so has no row in `tools`.
+    """
+    m, d = tables["monthly"], tables["disclosures"]
+    math_rows = m[(m["field"] == "math") & (m["population"] == "all") & ~m["is_partial"]]
+
+    purpose = math_rows[math_rows["metric"] == "ai_ack_purpose"]
+    per_bucket = purpose.groupby("category")["numerator"].sum()
+    for bucket, published in per_bucket.items():
+        listed = d.loc[d["bucket"] == bucket, "arxiv_id"].nunique()
+        assert int(listed) == int(published), bucket
+
+    vendor = math_rows[math_rows["metric"] == "ai_ack_vendor"]
+    per_paper = d.drop_duplicates("arxiv_id").set_index("arxiv_id")["vendors"]
+    for category, published in vendor.groupby("category")["numerator"].sum().items():
+        listed = sum(
+            1 for v in per_paper if category in [x.strip() for x in v.split(";") if x.strip()]
+        )
+        assert int(listed) == int(published), category
+
+
+@pytest.mark.parametrize(
+    ("cross", "row_of", "column_of"),
+    [
+        ("ai_ack_vendor_group", "ai_ack_vendor", "ai_ack_purpose"),
+        ("author_adopted_vendor_group", "author_adopted_vendor", "author_adopted_group"),
+    ],
+)
+def test_the_crosses_sit_inside_both_their_marginals(tables, cross, row_of, column_of):
+    """`<vendor>:<bucket>` counts papers (or authors) that did BOTH, so it cannot exceed
+    either marginal. It also does not sum to either: both dimensions are multi-label."""
+    m = tables["monthly"]
+    wanted = m[m["metric"].isin([cross, row_of, column_of])]
+    key = ["field", "population", "period"]
+    lookup = {
+        (metric, *k): dict(zip(g["category"], g["numerator"], strict=True))
+        for metric in (cross, row_of, column_of)
+        for k, g in wanted[wanted["metric"] == metric].groupby(key)
+    }
+    checked = 0
+    for (metric, *k), cells in lookup.items():
+        if metric != cross:
+            continue
+        vendors = lookup.get((row_of, *k), {})
+        buckets = lookup.get((column_of, *k), {})
+        for category, n in cells.items():
+            vendor, bucket = category.split(":", 1)
+            assert n <= vendors.get(vendor, 0), (category, k)
+            assert n <= buckets.get(bucket, 0), (category, k)
+            checked += 1
+    assert checked > 0, f"{cross} has no rows to check"
