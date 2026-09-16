@@ -1,21 +1,4 @@
-# AI Use in Mathematics Research — arXiv Data
-
-Per-paper and per-author data behind Epoch AI's tracker of how AI is changing
-mathematical research practice, measured on arXiv, together with the monthly series
-the tracker's charts draw. Two datasets and the chart file:
-
-- **Papers → AI-use disclosures.** Every mathematics paper counted as disclosing AI
-  use, from January 2023 to the latest complete month, with the use-case tags assigned to it
-  and the verbatim quote from the paper that justifies each tag. Alongside it, the
-  denominators: how many papers were listed and examined in each month and field.
-- **Authors.** Every author key in arXiv's mathematics set with their first paper,
-  their paper list, per-field paper counts, membership of each field's fixed author
-  panel, and a crosswalk to OpenAlex author ids and ORCIDs.
-
-- **The monthly series.** The aggregate file the charts read, one row per metric,
-  field, month, population and category, stored as numerator and denominator. Every
-  series in it can be rebuilt from the two datasets above, and the tests do so for
-  the disclosure rate, the paper counts, and the career-length composition.
+# Math Research Impacts Data
 
 The tracker's charts are at <https://epoch.ai/data/arxiv>.
 
@@ -91,71 +74,13 @@ were produced.
 `data/manifest.json` records the snapshot: when it was generated, from which
 pipeline commit, and the row counts and coverage figures for that release.
 
-## Reading the data honestly
-
-A few properties of these tables are easy to get wrong.
-
-- **The disclosure rate is `papers_disclosing / papers_examined`**, from the
-  `examined` table, and the `disclosures` table lists exactly those papers. The
-  `ai_ack_rate` rows of the monthly file carry the same two numbers. The
-  denominator is papers whose TeX source we could read, not papers listed; the two
-  differ by a few percent. Use the `field == "all"` rows for a math-wide figure; the
-  field rows do not sum to it, because small fields are included here and the
-  aggregate is computed over papers.
-- **Every rate is a floor.** Papers reach the classifier only if a keyword scan finds
-  an AI-related term in them. A paper that discloses AI use in words the scan does
-  not catch is not here, and the size of that gap is unknown.
-- **Recent months rise after publication.** Disclosure statements are often added
-  when a paper is revised for a journal. Each monthly refresh re-reads revised papers,
-  so a month's count is "as of the snapshot" and legitimately grows for a while.
-- **Tags are model judgements with receipts.** A language model assigned the tags;
-  a second model tried to refute every one, and every surviving tag carries the
-  verbatim quote it rests on. The `verifier` column says whether the second reader
-  found the tag `supported` or `borderline`. Borderline tags are included pending
-  human review. If you believe a paper is mis-tagged, open an issue citing the arXiv
-  id: the quote is there to be argued with.
-- **Author keys are normalised names, not people.** Two people with the same name
-  share a key, and one person written two ways has two keys. The `author_ids`
-  crosswalk to OpenAlex and ORCID is the way to a stronger identity, and it is
-  published as a long table precisely because the two sources disagree in both
-  directions.
-- **The panel is a definition, not a ranking.** A field's panel is the set of authors
-  with at least three papers in that field during 2019–2022, at least five
-  core-journal papers in OpenAlex, and at least one further mathematics paper from
-  2023 on. It exists so that a change in output can be read as a change in what the
-  same people did, and nothing more.
-
-## Coverage
-
-The paper-level tables and the monthly series begin in **January 2023**. The pipeline
-measures from 2018, but 2018–2022 holds four disclosing papers in five years and was
-read as excerpts rather than full text, so the public dataset starts where the
-full-text tier does. The author tables keep the full history of arXiv mathematics
-from 1989, because first papers and career lengths depend on it.
-
-## What is deliberately absent
-
-Disclosures the authors wrote only in TeX comments, and then did not render in the
-PDF, are counted in an aggregate sub-series on the tracker but are not listed per
-paper here. Papers the model judged to be *about* AI are excluded from the disclosure
-tables, even when their authors also used AI. There is no per-author "uses AI"
-column: the tables let anyone compute it, but it is not a judgement this dataset
-makes.
-
 ## Refresh
 
-The pipeline runs monthly, after arXiv publishes the previous month's source
-archives. A refresh replaces the files in `data/` and updates `manifest.json`; the
-diff is the changelog. History can change on a refresh, for the reasons above. The
-monthly series file is the one the website's charts read, so the charts and this
-repository describe one snapshot. Two tracker metrics are not in
-it, because nothing here can reproduce them: Lean formalization claims and pages per
-paper.
+The pipeline runs monthly. 
 
 ## Citation
 
 > Epoch AI (2026). *AI use in mathematics research: arXiv disclosures and author
 > tables.* https://github.com/epoch-research/ai-math-arxiv
 
-Licensed under [CC BY 4.0](LICENSE). Paper metadata and author bylines are from
-arXiv; author identifiers are from OpenAlex.
+Licensed under [CC BY 4.0](LICENSE). 
