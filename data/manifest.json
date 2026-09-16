@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-16T16:48:11+00:00",
-  "pipeline_commit": "9259e0e1c95199b442c3de86670df321b5c62c61",
+  "generated_at": "2026-09-16T17:10:07+00:00",
+  "pipeline_commit": "c9fbcfd2198e67d1144b06764e1b12a0fbb069d7",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -102,6 +102,7 @@
       "ai_ack_vendor_group",
       "ai_no_use_rate",
       "author_adopted_group",
+      "author_adopted_tenure",
       "author_adopted_vendor",
       "author_adopted_vendor_group",
       "author_tenure",
@@ -156,7 +157,7 @@
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 166670
+      "rows": 172522
     },
     "disclosures": {
       "path": "math_disclosures.csv",
