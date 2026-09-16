@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-16T15:44:41+00:00",
-  "pipeline_commit": "c8f20bc822b8c6ec29aaa78cd4efafb11ca9c4e8",
+  "generated_at": "2026-09-16T16:48:11+00:00",
+  "pipeline_commit": "9259e0e1c95199b442c3de86670df321b5c62c61",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -156,7 +156,7 @@
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 213486
+      "rows": 166670
     },
     "disclosures": {
       "path": "math_disclosures.csv",
