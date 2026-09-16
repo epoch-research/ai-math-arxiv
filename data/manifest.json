@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-16T15:27:43+00:00",
-  "pipeline_commit": "6d7025680fbd8e19d23ffee99af7637417aedcf8",
+  "generated_at": "2026-09-16T15:44:41+00:00",
+  "pipeline_commit": "c8f20bc822b8c6ec29aaa78cd4efafb11ca9c4e8",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -24,7 +24,6 @@
     "bucket_by_tag": {
       "code_computation": "code_computation",
       "draft_text_generated": "writing",
-      "figures_media": "other",
       "literature_search": "lit_review",
       "math_checking": "research_assistance",
       "translation": "writing",
@@ -157,7 +156,7 @@
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 240238
+      "rows": 213486
     },
     "disclosures": {
       "path": "math_disclosures.csv",
