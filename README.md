@@ -24,8 +24,8 @@ get_paper("2608.00377")                             # one paper, end to end
 | `get_tools` | one row per credited tool, with the crediting sentence | arxiv_id, vendor, tool, month, field |
 | `get_paper` | one paper: outcome, tags, quotes, tools | arxiv_id |
 | `get_examined` | the denominators, per month and field | month, field |
-| `get_authors` | one row per author key | field, established |
-| `get_author_fields` | one row per author and field, with the established flag | author, field, established |
+| `get_authors` | one row per author key | field, panel |
+| `get_author_fields` | one row per author and field, with the panel flag | author, field, panel |
 | `get_author_papers` | one row per author and paper | author, field |
 | `get_first_paper` | an author's first paper in arXiv mathematics | author |
 | `get_author_ids` | the OpenAlex and ORCID  | author, with_orcid |
