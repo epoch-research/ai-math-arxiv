@@ -32,7 +32,8 @@ get_paper("2608.00377")                             # one paper, end to end
 | `load_table` | one table, unfiltered | name |
 | `get_all_tables` | all five, keyed by name | — |
 
-Everything returns a pandas DataFrame except `get_paper`, which returns a dict.
+Everything returns a pandas DataFrame except `get_paper`, which returns a dict (or
+`None` for an unlisted id), and `get_all_tables`, which returns a dict of DataFrames.
 The five table names are `monthly`, `disclosures`, `tools`, `examined`, `papers`. 
 
 ## Arguments
