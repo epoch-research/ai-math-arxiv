@@ -16,6 +16,7 @@ One request per paper (Batch API, GPT-5.6 Sol, effort medium, strict JSON schema
   sub-series.
 
 Scope: every 2023+ paper with ≥1 term-list hit gets this full-text read. 
+
 ---
 ## 2. The system prompt (verbatim)
 
