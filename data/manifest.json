@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-16T17:10:07+00:00",
-  "pipeline_commit": "c9fbcfd2198e67d1144b06764e1b12a0fbb069d7",
+  "generated_at": "2026-09-17T06:32:56+00:00",
+  "pipeline_commit": "28c6f73a32960f1d1c800bb4aa800b33991b7cc1",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -125,7 +125,7 @@
     "through": "2026-08",
     "papers_examined": 152361,
     "papers_disclosing": 3971,
-    "tools_listed": 5799,
+    "tools_listed": 5760,
     "tools_dropped_unverified_receipt": 20,
     "outcomes": {
       "no_hit": 136848,
@@ -149,8 +149,8 @@
     "n_authors": 341992,
     "n_author_paper_links": 1741418,
     "openalex_crosswalk": {
-      "authors_with_openalex_id": 152713,
-      "authors_with_orcid": 90486,
+      "authors_with_openalex_id": 154635,
+      "authors_with_orcid": 90881,
       "coverage_note": "works pulled for 2018+ papers only"
     }
   },
@@ -173,7 +173,7 @@
     },
     "tools": {
       "path": "math_tools.csv",
-      "rows": 5799
+      "rows": 5760
     },
     "authors": {
       "path": "math_authors.csv.gz",
@@ -189,7 +189,7 @@
     },
     "author_ids": {
       "path": "math_author_ids.csv.gz",
-      "rows": 206600
+      "rows": 212653
     }
   }
 }
