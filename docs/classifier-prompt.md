@@ -1,13 +1,8 @@
 # The classifier prompt
 
 Everything the model is told when it reads a paper, reproduced as it was sent for
-classification v5, the run behind the current snapshot. The system prompt in section 2
-and the schema descriptions in section 3 are the model's complete instructions: there
-is no other channel.
-
-The pipeline builds the prompt by parsing the document this page reproduces, and
-refuses to start if a tag is defined in one and missing from the other. So the wording
-below is the wording the model received, not a summary written after the fact.
+classification. The system prompt in section 2
+and the schema descriptions in section 3 are the model's complete instructions.
 
 ---
 
