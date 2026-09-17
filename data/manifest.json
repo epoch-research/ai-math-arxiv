@@ -94,24 +94,12 @@
   },
   "monthly": {
     "metrics": [
-      "ai_ack_authors_band",
-      "ai_ack_novelty",
       "ai_ack_purpose",
       "ai_ack_rate",
       "ai_ack_vendor",
       "ai_ack_vendor_group",
       "ai_no_use_rate",
-      "author_adopted_group",
-      "author_adopted_tenure",
-      "author_adopted_vendor",
-      "author_adopted_vendor_group",
-      "author_tenure",
-      "authors_band",
-      "authors_per_paper",
-      "fresh_author_rate",
-      "panel_adopted_rate",
-      "papers_total",
-      "total_adopted_rate"
+      "papers_total"
     ],
     "excluded": [
       "lean_proof_rate",
@@ -137,27 +125,16 @@
     },
     "partial_months": []
   },
-  "authors": {
-    "history_complete_from": "1989-04",
-    "name_key": "full",
-    "panel": {
-      "window": "2019-2022",
-      "min_papers_in_field": 3,
-      "min_core_journal_papers": 5,
-      "active_from": "2023-01"
-    },
-    "n_authors": 341992,
-    "n_author_paper_links": 1741418,
-    "openalex_crosswalk": {
-      "authors_with_openalex_id": 154635,
-      "authors_with_orcid": 90881,
-      "coverage_note": "works pulled for 2018+ papers only"
-    }
+  "panel": {
+    "window": "2019-2022",
+    "min_papers_in_field": 3,
+    "min_core_journal_papers": 5,
+    "active_from": "2023-01"
   },
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 172522
+      "rows": 73605
     },
     "disclosures": {
       "path": "math_disclosures.csv",
@@ -174,22 +151,6 @@
     "tools": {
       "path": "math_tools.csv",
       "rows": 5760
-    },
-    "authors": {
-      "path": "math_authors.csv.gz",
-      "rows": 341992
-    },
-    "author_fields": {
-      "path": "math_author_fields.csv.gz",
-      "rows": 353678
-    },
-    "author_papers": {
-      "path": "math_author_papers.csv.gz",
-      "rows": 1741418
-    },
-    "author_ids": {
-      "path": "math_author_ids.csv.gz",
-      "rows": 212653
     }
   }
 }

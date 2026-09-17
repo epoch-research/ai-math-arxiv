@@ -29,17 +29,11 @@ get_paper("2608.00377")                             # one paper, end to end
 | `get_tools` | one row per credited tool, with the crediting sentence | arxiv_id, vendor, tool, month, field |
 | `get_paper` | one paper: outcome, tags, quotes, tools | arxiv_id |
 | `get_examined` | the denominators, per month and field | month, field |
-| `get_authors` | one row per author key | field, panel |
-| `get_author_fields` | one row per author and field, with the panel flag | author, field, panel |
-| `get_author_papers` | one row per author and paper | author, field |
-| `get_first_paper` | an author's first paper in arXiv mathematics | author |
-| `get_author_ids` | the OpenAlex and ORCID  | author, with_orcid |
 | `load_table` | one table, unfiltered | name |
-| `get_all_tables` | all nine, keyed by name | — |
+| `get_all_tables` | all five, keyed by name | — |
 
-Everything returns a pandas DataFrame except `get_paper` and `get_first_paper`, which return
-a dict.
-The nine table names are `monthly`, `disclosures`, `tools`, `examined`, `papers`, `authors`, `author_fields`, `author_papers`, `author_ids`. 
+Everything returns a pandas DataFrame except `get_paper`, which returns a dict.
+The five table names are `monthly`, `disclosures`, `tools`, `examined`, `papers`. 
 
 ## Arguments
 
@@ -48,7 +42,6 @@ The nine table names are `monthly`, `disclosures`, `tools`, `examined`, `papers`
 - **Fields** take an arXiv primary category (`"math.CO"`) or `"all"`.
 - **arXiv ids** are accepted in any spelling: `2608.00377v2`, `arXiv:2608.00377`, an abs
   or pdf URL. `normalize_arxiv_id` is the rule.
-- **Author keys** are normalised names; `normalize_author("First Last")` gives the key.
 - **`source`** is on every call. Pass `source="github"` to read the published files
   online instead of cloning, or a directory path of your own.
 
