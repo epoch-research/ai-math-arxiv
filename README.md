@@ -4,7 +4,7 @@ This repository contains the data for Epoch's AI Use in Math Research [data expl
 
 ## Accessing the data
 
-Access the data by cloning this git repository and calling the following Python functions. 
+Access the data using this repository by calling the following Python functions. 
 See an example below. 
 
 ```python
