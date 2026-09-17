@@ -34,7 +34,7 @@ get_paper("2608.00377")                             # one paper, end to end
 
 Everything returns a pandas DataFrame except `get_paper` and `get_first_paper`, which return
 a dict.
-The nine table names are monthly, disclosures, tools, examined, papers, authors, author_fields, author_papers, author_ids. 
+The nine table names are `monthly`, `disclosures`, `tools`, `examined`, `papers`, `authors`, `author_fields`, `author_papers`, `author_ids`. 
 
 ## Arguments
 
@@ -43,7 +43,7 @@ The nine table names are monthly, disclosures, tools, examined, papers, authors,
 - **Fields** take an arXiv primary category (`"math.CO"`) or `"all"`.
 - **arXiv ids** are accepted in any spelling: `2608.00377v2`, `arXiv:2608.00377`, an abs
   or pdf URL. `normalize_arxiv_id` is the rule.
-- **Author keys** are normalised names; `normalize_author("Terence Tao")` gives the key.
+- **Author keys** are normalised names; `normalize_author("First Last")` gives the key.
 - **`source`** is on every call. Pass `source="github"` to read the published files
   online instead of cloning, or a directory path of your own.
 
