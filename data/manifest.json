@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-17T06:32:56+00:00",
-  "pipeline_commit": "28c6f73a32960f1d1c800bb4aa800b33991b7cc1",
+  "generated_at": "2026-09-17T06:50:02+00:00",
+  "pipeline_commit": "0b269753ed6d0d284b5b98078cbb80043f69e3c0",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -161,7 +161,7 @@
     },
     "disclosures": {
       "path": "math_disclosures.csv",
-      "rows": 8691
+      "rows": 8587
     },
     "examined": {
       "path": "math_examined.csv",
