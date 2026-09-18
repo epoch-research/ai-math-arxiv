@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-17T06:50:02+00:00",
-  "pipeline_commit": "0b269753ed6d0d284b5b98078cbb80043f69e3c0",
+  "generated_at": "2026-09-18T03:59:00+00:00",
+  "pipeline_commit": "749aaff3ebf07e06a1065cc1e0a30a70622d55f7",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -10,14 +10,13 @@
     "second_reader": "claude-fable-5",
     "verdicts": 15513,
     "errored_verdicts": 0,
-    "reread_papers": 2148,
+    "reread_papers": 2451,
     "series_threshold": 0.1,
     "series_under_threshold": [
       "code_computation",
       "draft_text_generated",
       "figures_media",
       "literature_search",
-      "math_checking",
       "translation",
       "writing_polish"
     ],
@@ -25,7 +24,6 @@
       "code_computation": "code_computation",
       "draft_text_generated": "writing",
       "literature_search": "lit_review",
-      "math_checking": "research_assistance",
       "translation": "writing",
       "writing_polish": "writing"
     },
@@ -102,8 +100,20 @@
       "papers_total"
     ],
     "excluded": [
+      "ai_ack_authors_band",
+      "ai_ack_novelty",
+      "author_adopted_group",
+      "author_adopted_tenure",
+      "author_adopted_vendor",
+      "author_adopted_vendor_group",
+      "author_tenure",
+      "authors_band",
+      "authors_per_paper",
+      "fresh_author_rate",
       "lean_proof_rate",
-      "pages_per_paper"
+      "pages_per_paper",
+      "panel_adopted_rate",
+      "total_adopted_rate"
     ],
     "from": "2023-01",
     "through": "2026-09"
@@ -112,13 +122,13 @@
     "from": "2023-01",
     "through": "2026-08",
     "papers_examined": 152361,
-    "papers_disclosing": 3971,
-    "tools_listed": 5760,
+    "papers_disclosing": 3972,
+    "tools_listed": 5761,
     "tools_dropped_unverified_receipt": 20,
     "outcomes": {
       "no_hit": 136848,
-      "no_disclosure": 9741,
-      "disclosure": 3971,
+      "no_disclosure": 9740,
+      "disclosure": 3972,
       "not_examined": 2402,
       "subject_matter": 1570,
       "denial": 231
@@ -138,7 +148,7 @@
     },
     "disclosures": {
       "path": "math_disclosures.csv",
-      "rows": 8587
+      "rows": 8642
     },
     "examined": {
       "path": "math_examined.csv",
@@ -150,7 +160,7 @@
     },
     "tools": {
       "path": "math_tools.csv",
-      "rows": 5760
+      "rows": 5761
     }
   }
 }
