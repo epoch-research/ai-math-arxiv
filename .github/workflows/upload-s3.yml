@@ -36,6 +36,8 @@ jobs:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/epoch-gh-actions-datahub-${{ github.event.repository.name }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # sync --delete mirrors data/ into the prefix, so files removed from the
+      # repo are removed from S3 too (cp --recursive left them behind).
       - name: Upload data files
         shell: bash
-        run: aws s3 cp data/ "s3://$S3_BUCKET/$S3_PREFIX/" --recursive
+        run: aws s3 sync data/ "s3://$S3_BUCKET/$S3_PREFIX/" --delete
