@@ -1301,7 +1301,7 @@ month,field,papers_listed,papers_examined,papers_disclosing,papers_denying,is_pa
 2026-06,math.SG,35,35,1,0,False
 2026-06,math.SP,43,43,2,0,False
 2026-06,math.ST,140,140,11,0,False
-2026-07,all,5264,5199,785,28,False
+2026-07,all,5264,5199,786,28,False
 2026-07,math.AC,71,70,12,0,False
 2026-07,math.AG,267,264,39,1,False
 2026-07,math.AP,592,586,44,4,False
@@ -1322,7 +1322,7 @@ month,field,papers_listed,papers_examined,papers_disclosing,papers_denying,is_pa
 2026-07,math.LO,84,84,15,0,False
 2026-07,math.MG,67,65,19,0,False
 2026-07,math.NA,447,442,63,0,False
-2026-07,math.NT,351,348,55,3,False
+2026-07,math.NT,351,348,56,3,False
 2026-07,math.OA,51,51,11,1,False
 2026-07,math.OC,448,431,42,0,False
 2026-07,math.PR,323,320,55,0,False

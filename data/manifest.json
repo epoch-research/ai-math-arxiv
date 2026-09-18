@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-16T17:10:07+00:00",
-  "pipeline_commit": "c9fbcfd2198e67d1144b06764e1b12a0fbb069d7",
+  "generated_at": "2026-09-18T04:20:39+00:00",
+  "pipeline_commit": "8207687213bc9f417ba0399abedc6847e1746e8c",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -10,14 +10,13 @@
     "second_reader": "claude-fable-5",
     "verdicts": 15513,
     "errored_verdicts": 0,
-    "reread_papers": 2148,
+    "reread_papers": 2451,
     "series_threshold": 0.1,
     "series_under_threshold": [
       "code_computation",
       "draft_text_generated",
       "figures_media",
       "literature_search",
-      "math_checking",
       "translation",
       "writing_polish"
     ],
@@ -25,7 +24,6 @@
       "code_computation": "code_computation",
       "draft_text_generated": "writing",
       "literature_search": "lit_review",
-      "math_checking": "research_assistance",
       "translation": "writing",
       "writing_polish": "writing"
     },
@@ -94,13 +92,16 @@
   },
   "monthly": {
     "metrics": [
-      "ai_ack_authors_band",
-      "ai_ack_novelty",
       "ai_ack_purpose",
       "ai_ack_rate",
       "ai_ack_vendor",
       "ai_ack_vendor_group",
       "ai_no_use_rate",
+      "papers_total"
+    ],
+    "excluded": [
+      "ai_ack_authors_band",
+      "ai_ack_novelty",
       "author_adopted_group",
       "author_adopted_tenure",
       "author_adopted_vendor",
@@ -109,13 +110,10 @@
       "authors_band",
       "authors_per_paper",
       "fresh_author_rate",
-      "panel_adopted_rate",
-      "papers_total",
-      "total_adopted_rate"
-    ],
-    "excluded": [
       "lean_proof_rate",
-      "pages_per_paper"
+      "pages_per_paper",
+      "panel_adopted_rate",
+      "total_adopted_rate"
     ],
     "from": "2023-01",
     "through": "2026-09"
@@ -124,44 +122,33 @@
     "from": "2023-01",
     "through": "2026-08",
     "papers_examined": 152361,
-    "papers_disclosing": 3971,
-    "tools_listed": 5799,
+    "papers_disclosing": 3972,
+    "tools_listed": 5761,
     "tools_dropped_unverified_receipt": 20,
     "outcomes": {
       "no_hit": 136848,
-      "no_disclosure": 9741,
-      "disclosure": 3971,
+      "no_disclosure": 9740,
+      "disclosure": 3972,
       "not_examined": 2402,
       "subject_matter": 1570,
       "denial": 231
     },
     "partial_months": []
   },
-  "authors": {
-    "history_complete_from": "1989-04",
-    "name_key": "full",
-    "panel": {
-      "window": "2019-2022",
-      "min_papers_in_field": 3,
-      "min_core_journal_papers": 5,
-      "active_from": "2023-01"
-    },
-    "n_authors": 341992,
-    "n_author_paper_links": 1741418,
-    "openalex_crosswalk": {
-      "authors_with_openalex_id": 152713,
-      "authors_with_orcid": 90486,
-      "coverage_note": "works pulled for 2018+ papers only"
-    }
+  "panel": {
+    "window": "2019-2022",
+    "min_papers_in_field": 3,
+    "min_core_journal_papers": 5,
+    "active_from": "2023-01"
   },
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 172522
+      "rows": 73605
     },
     "disclosures": {
       "path": "math_disclosures.csv",
-      "rows": 8691
+      "rows": 8642
     },
     "examined": {
       "path": "math_examined.csv",
@@ -173,23 +160,7 @@
     },
     "tools": {
       "path": "math_tools.csv",
-      "rows": 5799
-    },
-    "authors": {
-      "path": "math_authors.csv.gz",
-      "rows": 341992
-    },
-    "author_fields": {
-      "path": "math_author_fields.csv.gz",
-      "rows": 353678
-    },
-    "author_papers": {
-      "path": "math_author_papers.csv.gz",
-      "rows": 1741418
-    },
-    "author_ids": {
-      "path": "math_author_ids.csv.gz",
-      "rows": 206600
+      "rows": 5761
     }
   }
 }

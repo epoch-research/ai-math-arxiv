@@ -3,7 +3,7 @@
 Verifies each public getter loads the committed data, returns a DataFrame with the
 documented columns, and that the tables agree with each other: the per-paper
 disclosure list counts to the `examined` file's `papers_disclosing` in every cell,
-and every author key in the link tables exists in `authors`.
+and the chart series rebuilds from the row-level tables.
 """
 
 from __future__ import annotations
@@ -15,20 +15,14 @@ from arxiv_math_ai_data import (
     FILES,
     OUTCOMES,
     get_all_tables,
-    get_author_fields,
-    get_author_ids,
-    get_author_papers,
-    get_authors,
     get_disclosing_papers,
     get_disclosures,
     get_examined,
-    get_first_paper,
     get_monthly,
     get_paper,
     get_papers,
     get_tools,
     normalize_arxiv_id,
-    normalize_author,
 )
 
 DISCLOSURE_COLUMNS = {
@@ -39,18 +33,12 @@ EXAMINED_COLUMNS = {
     "month", "field", "papers_listed", "papers_examined", "papers_disclosing",
     "papers_denying", "is_partial",
 }
-AUTHOR_COLUMNS = {
-    "author", "name", "first_paper_id", "first_paper_month", "first_paper_url",
-    "last_paper_month", "n_papers", "n_papers_math_primary",
-}
 #: Multi-label series the tracker page draws one line per category from. Each category of
 #: one of these shares the cell's denominator, so a category with no row for a month is a
 #: hidden zero, not an undefined rate — and a consumer bucketing by quarter would silently
-#: drop that whole quarter. `ai_ack_authors_band` and `ai_ack_novelty` are deliberately NOT
-#: here: their denominator is the band's own papers, which can genuinely be zero.
+#: drop that whole quarter. Every categorised metric in the series is now one of these.
 DENSE_MULTI_LABEL = (
     "ai_ack_purpose", "ai_ack_vendor", "ai_ack_vendor_group",
-    "author_adopted_group", "author_adopted_vendor", "author_adopted_vendor_group",
 )
 SECOND_READER = {"reread_confirmed", "pair_supported"}
 
@@ -96,8 +84,6 @@ def test_examined_columns_and_all_rows(tables):
     assert df["month"].min() == "2023-01"
     assert tables["papers"]["month"].min() == "2023-01"
     assert tables["monthly"]["period"].min() == "2023-01"
-    # author history is NOT truncated: first papers reach back before 2023
-    assert tables["authors"]["first_paper_month"].min() < "2000-01"
     assert (df["papers_examined"] <= df["papers_listed"]).all()
     assert (df["papers_disclosing"] <= df["papers_examined"]).all()
     assert (df["field"] == "all").any()
@@ -140,63 +126,6 @@ def test_examined_field_argument():
     assert set(only_all["field"]) == {"all"}
     everything = get_examined()
     assert len(everything) > len(only_all)
-
-
-def test_author_tables_are_consistent(tables):
-    authors, fields, papers, ids = (
-        tables["authors"], tables["author_fields"], tables["author_papers"], tables["author_ids"]
-    )
-    assert AUTHOR_COLUMNS.issubset(authors.columns)
-    assert not authors["author"].duplicated().any()
-    keys = set(authors["author"])
-    assert set(fields["author"]) <= keys
-    assert set(papers["author"]) <= keys
-    assert set(ids["author"]) <= keys
-    assert (authors["first_paper_url"] == "https://arxiv.org/abs/" + authors["first_paper_id"]).all()
-    assert (authors["n_papers_math_primary"] <= authors["n_papers"]).all()
-
-
-def test_panel_filter():
-    panel = get_authors(field="math.CO", panel=True)
-    rest = get_authors(field="math.CO", panel=False)
-    everyone = get_authors(field="math.CO")
-    assert len(panel) > 0 and len(rest) > 0
-    assert len(panel) + len(rest) == len(everyone)
-    assert set(panel["author"]).isdisjoint(rest["author"])
-    flags = get_author_fields(field="math.CO", panel=True)
-    assert set(flags["author"]) == set(panel["author"])
-
-
-def test_author_papers_and_first_paper_agree(tables):
-    a = tables["authors"].iloc[0]
-    papers = get_author_papers(a["author"])
-    assert len(papers) == int(a["n_papers"])
-    first = get_first_paper(a["author"])
-    assert first == {
-        "arxiv_id": a["first_paper_id"],
-        "month": a["first_paper_month"],
-        "url": a["first_paper_url"],
-    }
-    assert papers["month"].min() == first["month"]
-    assert get_first_paper("nobody by this name") is None
-
-
-def test_author_ids_filters(tables):
-    with_orcid = get_author_ids(with_orcid=True)
-    assert (with_orcid["orcid"] != "").all()
-    assert with_orcid["orcid"].str.startswith("https://orcid.org/").all()
-    some = tables["author_ids"].iloc[0]["author"]
-    rows = get_author_ids(some)
-    assert set(rows["author"]) == {some}
-    assert list(rows["n_shared_papers"]) == sorted(rows["n_shared_papers"], reverse=True)
-
-
-def test_normalize_author_matches_published_keys(tables):
-    assert normalize_author("Paul Erdős") == "paul erdos"
-    assert normalize_author("J.-P. Serre") == "j p serre"
-    # every published key is already in normalised form
-    sample = tables["authors"]["author"].head(2000)
-    assert (sample.map(normalize_author) == sample).all()
 
 
 def test_lookup_by_arxiv_id(tables):
@@ -316,20 +245,6 @@ def test_monthly_papers_total_matches_the_papers_table():
         assert int(row["numerator"]) == int(listed), (period, field)
 
 
-def test_monthly_tenure_is_rebuildable_from_the_author_tables():
-    month = "2026-08"
-    first = get_authors().set_index("author")["first_paper_month"]
-    p = get_author_papers()
-    p = p[p["is_math_primary"] & (p["month"] == month)].drop_duplicates("author")
-    to_n = lambda m: int(m[:4]) * 12 + int(m[5:7])  # noqa: E731
-    elapsed = p["month"].map(to_n) - p["author"].map(first).map(to_n)
-    rebuilt = pd.cut(elapsed, [-1, 0, 60, 120, 10**6],
-                     labels=["debut", "years_0_5", "years_5_10", "years_10_plus"]).value_counts()
-    published = get_monthly("author_tenure", period=month).set_index("category")["numerator"]
-    for bucket, n in rebuilt.items():
-        assert int(n) == int(published[bucket]), bucket
-
-
 def test_multi_label_series_are_dense_in_every_cell(tables):
     """Every category of a shared-denominator series appears in every period that series
     covers.
@@ -380,16 +295,10 @@ def test_use_case_and_vendor_series_agree_with_the_per_paper_tables(tables):
         assert int(listed) == int(published), category
 
 
-@pytest.mark.parametrize(
-    ("cross", "row_of", "column_of"),
-    [
-        ("ai_ack_vendor_group", "ai_ack_vendor", "ai_ack_purpose"),
-        ("author_adopted_vendor_group", "author_adopted_vendor", "author_adopted_group"),
-    ],
-)
-def test_the_crosses_sit_inside_both_their_marginals(tables, cross, row_of, column_of):
-    """`<vendor>:<bucket>` counts papers (or authors) that did BOTH, so it cannot exceed
-    either marginal. It also does not sum to either: both dimensions are multi-label."""
+def test_the_cross_sits_inside_both_its_marginals(tables):
+    """`<vendor>:<bucket>` counts papers that did BOTH, so it cannot exceed either
+    marginal. It also does not sum to either: both dimensions are multi-label."""
+    cross, row_of, column_of = "ai_ack_vendor_group", "ai_ack_vendor", "ai_ack_purpose"
     m = tables["monthly"]
     wanted = m[m["metric"].isin([cross, row_of, column_of])]
     key = ["field", "population", "period"]

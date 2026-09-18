@@ -1,6 +1,6 @@
 """AI use in mathematics research, measured on arXiv — the public dataset.
 
-Two datasets plus the chart series, eight tables, read from the CSV files in `data/`:
+One dataset plus the chart series, five tables, read from the CSV files in `data/`:
 
   THE MONTHLY SERIES
     monthly        the aggregate file the tracker's charts draw, one row per
@@ -15,23 +15,16 @@ Two datasets plus the chart series, eight tables, read from the CSV files in `da
     tools          one row per (disclosing paper, credited tool): the tool verbatim, the
                    vendor it maps to, and the sentence in the paper crediting it
 
-  AUTHORS
-    authors        one row per author key: display name, first paper, paper counts
-    author_fields  one row per (author, math field): in-field counts and panel flag
-    author_papers  one row per (author, paper)
-    author_ids     crosswalk to OpenAlex author ids and ORCIDs
-
 Usage:
 
-    from arxiv_math_ai_data import get_disclosures, get_authors
+    from arxiv_math_ai_data import get_disclosures, get_monthly
 
     get_disclosures(month="2026-08", field="math.CO")     # tag rows, with quotes
     get_disclosing_papers(month="2026")                    # one row per paper
-    get_authors(field="math.CO", panel=True)               # a field's fixed author panel
-    get_author_papers("terence tao")                       # every paper by an author key
-    get_first_paper("terence tao")                         # id, month, URL
     get_paper("2608.00377")                                # one paper's tags and quotes
+    get_papers(month="2026-08", outcome="denial")          # papers that deny AI use
     get_tools(vendor="anthropic", month="2026")            # tool receipts behind a vendor
+    get_examined(month="2026")                             # the denominators
     get_monthly("ai_ack_rate", field="math.CO")            # a chart series, ready to plot
 
 Every getter reads the local `data/` directory by default. Pass `source="github"` to
@@ -61,10 +54,6 @@ FILES = {
     "examined": "math_examined.csv",
     "papers": "math_papers.csv.gz",
     "tools": "math_tools.csv",
-    "authors": "math_authors.csv.gz",
-    "author_fields": "math_author_fields.csv.gz",
-    "author_papers": "math_author_papers.csv.gz",
-    "author_ids": "math_author_ids.csv.gz",
 }
 
 #: The value of `field` that means "every mathematics paper". The aggregate rows in
@@ -74,10 +63,9 @@ ALL_FIELDS = "all"
 #: Columns that must stay strings: arXiv ids like "2606.00001" would otherwise parse
 #: as floats and lose their trailing zero.
 _STRING_COLUMNS = {
-    "arxiv_id", "first_paper_id", "month", "first_paper_month", "last_paper_month",
-    "field", "author", "name", "quote", "orcid", "openalex_author_id", "tag", "bucket",
-    "second_reader", "tools_named", "vendors", "confidence", "url", "tool", "vendor",
-    "first_paper_url", "outcome", "metric", "period", "population", "category", "provenance",
+    "arxiv_id", "month", "field", "quote", "tag", "bucket", "second_reader",
+    "tools_named", "vendors", "confidence", "url", "tool", "vendor", "outcome",
+    "metric", "period", "population", "category", "provenance",
 }
 
 #: The aggregate file names the math-wide aggregate `math`; the row-level tables and
@@ -113,7 +101,7 @@ def _load(name: str, base: str) -> pd.DataFrame:
     frame = pd.read_csv(path, dtype={c: "string" for c in _STRING_COLUMNS}, keep_default_na=False)
     # keep_default_na keeps an empty quote/orcid as "" rather than NaN; restore NaN-free
     # booleans and integers where the schema says so.
-    for col in ("panel", "is_partial", "is_math_primary", "examined"):
+    for col in ("is_partial", "examined"):
         if col in frame.columns:
             frame[col] = frame[col].map({"True": True, "False": False, True: True, False: False})
     return frame
@@ -368,113 +356,3 @@ def get_examined(
     if field is not None:
         mask &= df["field"] == field
     return df[mask].reset_index(drop=True)
-
-
-# --- authors --------------------------------------------------------------------------
-
-
-def get_authors(
-    field: str | None = None,
-    panel: bool | None = None,
-    source: str | Path | None = None,
-) -> pd.DataFrame:
-    """Author rows, optionally restricted to authors active in a field and/or in its panel.
-
-    `field` means "has at least one math-primary paper with that primary category".
-    `panel=True` keeps only members of that field's fixed author panel (docs/methodology.md);
-    `panel=False` keeps the field's non-members. With `field=None`, `panel=True` means
-    "in at least one field's panel".
-    """
-    authors = load_table("authors", source)
-    if field in (None, ALL_FIELDS) and panel is None:
-        return authors
-    fields = load_table("author_fields", source)
-    if field not in (None, ALL_FIELDS):
-        fields = fields[fields["field"] == field]
-    if panel is not None:
-        fields = fields[fields["panel"] == bool(panel)]
-    keep = set(fields["author"])
-    return authors[authors["author"].isin(keep)].reset_index(drop=True)
-
-
-def get_author_fields(
-    author: str | None = None,
-    field: str | None = None,
-    panel: bool | None = None,
-    source: str | Path | None = None,
-) -> pd.DataFrame:
-    """(author, field) rows: in-field paper counts and the per-field panel flag."""
-    df = load_table("author_fields", source)
-    mask = pd.Series(True, index=df.index)
-    if author is not None:
-        mask &= df["author"] == author
-    if field not in (None, ALL_FIELDS):
-        mask &= df["field"] == field
-    if panel is not None:
-        mask &= df["panel"] == bool(panel)
-    return df[mask].reset_index(drop=True)
-
-
-def get_author_papers(
-    author: str | None = None,
-    field: str | None = None,
-    source: str | Path | None = None,
-) -> pd.DataFrame:
-    """Every (author, paper) link, or those of one author key / one primary field."""
-    df = load_table("author_papers", source)
-    mask = pd.Series(True, index=df.index)
-    if author is not None:
-        mask &= df["author"] == author
-    if field not in (None, ALL_FIELDS):
-        mask &= df["field"] == field
-    return df[mask].reset_index(drop=True)
-
-
-def get_first_paper(author: str, source: str | Path | None = None) -> dict[str, str] | None:
-    """The author's first paper in arXiv's mathematics set: id, month, URL. None if the
-    key is unknown."""
-    df = load_table("authors", source)
-    row = df[df["author"] == author]
-    if row.empty:
-        return None
-    r = row.iloc[0]
-    return {
-        "arxiv_id": str(r["first_paper_id"]),
-        "month": str(r["first_paper_month"]),
-        "url": str(r["first_paper_url"]),
-    }
-
-
-def get_author_ids(
-    author: str | None = None,
-    with_orcid: bool | None = None,
-    source: str | Path | None = None,
-) -> pd.DataFrame:
-    """The OpenAlex / ORCID crosswalk. One row per (author key, OpenAlex id, ORCID)
-    with the number of shared papers supporting the link; best-supported row first
-    within each author. `with_orcid=True` keeps rows carrying an ORCID."""
-    df = load_table("author_ids", source)
-    mask = pd.Series(True, index=df.index)
-    if author is not None:
-        mask &= df["author"] == author
-    if with_orcid is not None:
-        mask &= (df["orcid"] != "") == bool(with_orcid)
-    return df[mask].reset_index(drop=True)
-
-
-def normalize_author(name: str) -> str:
-    """The author key for a display name, so callers can look people up by name.
-
-    This is the same rule the pipeline uses, reduced to what a name string needs:
-    lower-case, punctuation to spaces, accents folded, whitespace collapsed. TeX
-    escapes are not handled here — the published keys were computed from raw arXiv
-    bylines with TeX resolved first.
-    """
-    import unicodedata
-
-    folded = "".join(
-        c for c in unicodedata.normalize("NFKD", name) if not unicodedata.combining(c)
-    )
-    folded = folded.translate(str.maketrans("øØłŁđĐßæÆœŒ", "oOlLdDsaAoO"))
-    cleaned = re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", folded)).strip().lower()
-    return cleaned
