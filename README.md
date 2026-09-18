@@ -5,7 +5,6 @@ This repository contains the data for Epoch's AI Use in Math Research [data expl
 Read the full methodology here. We use the following data: 
  - arXiv metadata sourced from the [arXiv OAI-PMH interface](https://info.arxiv.org/help/oa/index.html)
  - arXiv full-text data sourced from the [arXiv Amazon S3 bulk data](https://info.arxiv.org/help/bulk_data_s3.html)
- - OpenAlex authorship information for each paper sourced from the [OpenAlex API](https://help.openalex.org/api/)
 
 ## Accessing the data
 
