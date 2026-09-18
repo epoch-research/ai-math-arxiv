@@ -31,7 +31,7 @@ rate, and every paper counted in the rate is here.
 | `field` | str | primary category |
 | `tag` | str | fine use tag |
 | `bucket` | str | the published use-case bucket the tag rolls into, or empty when the tag's series is not published; the bucket set is the `ai_ack_purpose` categories in [`monthly-series.md`](monthly-series.md) |
-| `second_reader` | str | how the second reader backed this tag: `reread_confirmed` (blind re-read of the paper) or `pair_supported` (ruled on the tag and its passage) |
+| `second_reader` | str | how the second reader backed this tag: `reread_confirmed` (blind re-read of the paper) or `pair_supported` (ruled on the tag and its quote) |
 | `quote` | str | verbatim text from the paper supporting the tag, whitespace collapsed |
 | `tools_named` | str | every AI tool or proof assistant the paper credits, verbatim, `; `-joined; paper-level, repeated on each of the paper's rows |
 | `vendors` | str | vendors derived from `tools_named`; `; `-joined; paper-level |
