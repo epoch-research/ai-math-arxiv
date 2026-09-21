@@ -6,7 +6,7 @@ Read the full methodology here. We use the following data:
  - arXiv metadata sourced from the [arXiv OAI-PMH interface](https://info.arxiv.org/help/oa/index.html)
  - arXiv full-text data sourced from the [arXiv Amazon S3 bulk data](https://info.arxiv.org/help/bulk_data_s3.html)
 
-Thank you to arXiv for use of its open access interoperability.
+Thank you to arXiv for use of its open access interoperability. This explorer was not reviewed or approved by, nor does it necessarily express or reflect the policies or opinions of, arXiv.
 
 ## Accessing the data
 
