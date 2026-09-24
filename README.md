@@ -2,9 +2,11 @@
 
 This repository contains the data for Epoch's AI Use in Math Research [data explorer](https://epoch.ai/data/arxiv). 
 
-Read the full methodology here. We use the following data: 
+Read the full methodology [here](https://epoch.ai/data/arxiv-documentation). We use the following data: 
  - arXiv metadata sourced from the [arXiv OAI-PMH interface](https://info.arxiv.org/help/oa/index.html)
  - arXiv full-text data sourced from the [arXiv Amazon S3 bulk data](https://info.arxiv.org/help/bulk_data_s3.html)
+
+Thank you to arXiv for use of its open access interoperability. This project was not reviewed or approved by, nor does it necessarily express or reflect the policies or opinions of, arXiv.
 
 ## Accessing the data
 
