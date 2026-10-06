@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-18T04:20:39+00:00",
-  "pipeline_commit": "8207687213bc9f417ba0399abedc6847e1746e8c",
+  "generated_at": "2026-10-06T00:55:05+00:00",
+  "pipeline_commit": "46962c3fd6f54da63dfb9d41a20fae7694c8fe50",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -8,9 +8,9 @@
       "gpt-5.6-sol"
     ],
     "second_reader": "claude-fable-5",
-    "verdicts": 15513,
+    "verdicts": 19244,
     "errored_verdicts": 0,
-    "reread_papers": 2451,
+    "reread_papers": 4823,
     "series_threshold": 0.1,
     "series_under_threshold": [
       "code_computation",
@@ -29,28 +29,28 @@
     },
     "series_qc": {
       "code_computation": {
-        "pairs": 1077,
-        "unsupported": 66
+        "pairs": 1837,
+        "unsupported": 96
       },
       "draft_text_generated": {
-        "pairs": 429,
-        "unsupported": 24
+        "pairs": 785,
+        "unsupported": 33
       },
       "figures_media": {
-        "pairs": 252,
-        "unsupported": 6
+        "pairs": 468,
+        "unsupported": 7
       },
       "literature_search": {
-        "pairs": 618,
-        "unsupported": 44
+        "pairs": 1335,
+        "unsupported": 105
       },
       "math_checking": {
-        "pairs": 907,
-        "unsupported": 53
+        "pairs": 2041,
+        "unsupported": 118
       },
       "name_collision": {
-        "pairs": 5737,
-        "unsupported": 96
+        "pairs": 5915,
+        "unsupported": 99
       },
       "new:model_evaluation": {
         "pairs": 2,
@@ -61,32 +61,32 @@
         "unsupported": 0
       },
       "no_use_declared": {
-        "pairs": 264,
-        "unsupported": 7
+        "pairs": 402,
+        "unsupported": 9
       },
       "other": {
-        "pairs": 378,
-        "unsupported": 211
+        "pairs": 615,
+        "unsupported": 344
       },
       "passing_mention": {
-        "pairs": 2845,
-        "unsupported": 300
+        "pairs": 3001,
+        "unsupported": 312
       },
       "purpose_unstated": {
-        "pairs": 103,
-        "unsupported": 15
+        "pairs": 206,
+        "unsupported": 21
       },
       "subject_matter": {
-        "pairs": 1742,
-        "unsupported": 168
+        "pairs": 1835,
+        "unsupported": 177
       },
       "translation": {
-        "pairs": 55,
+        "pairs": 89,
         "unsupported": 5
       },
       "writing_polish": {
-        "pairs": 2598,
-        "unsupported": 77
+        "pairs": 4744,
+        "unsupported": 120
       }
     }
   },
@@ -116,22 +116,22 @@
       "total_adopted_rate"
     ],
     "from": "2023-01",
-    "through": "2026-09"
+    "through": "2026-10"
   },
   "disclosures": {
     "from": "2023-01",
-    "through": "2026-08",
-    "papers_examined": 152361,
-    "papers_disclosing": 3972,
-    "tools_listed": 5761,
-    "tools_dropped_unverified_receipt": 20,
+    "through": "2026-09",
+    "papers_examined": 160669,
+    "papers_disclosing": 7141,
+    "tools_listed": 10410,
+    "tools_dropped_unverified_receipt": 29,
     "outcomes": {
-      "no_hit": 136848,
-      "no_disclosure": 9740,
-      "disclosure": 3972,
-      "not_examined": 2402,
-      "subject_matter": 1570,
-      "denial": 231
+      "no_hit": 141427,
+      "no_disclosure": 10117,
+      "disclosure": 7141,
+      "not_examined": 2519,
+      "subject_matter": 1622,
+      "denial": 362
     },
     "partial_months": []
   },
@@ -144,23 +144,23 @@
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 73605
+      "rows": 75276
     },
     "disclosures": {
       "path": "math_disclosures.csv",
-      "rows": 8642
+      "rows": 16786
     },
     "examined": {
       "path": "math_examined.csv",
-      "rows": 1364
+      "rows": 1395
     },
     "papers": {
       "path": "math_papers.csv.gz",
-      "rows": 154763
+      "rows": 163188
     },
     "tools": {
       "path": "math_tools.csv",
-      "rows": 5761
+      "rows": 10410
     }
   }
 }
