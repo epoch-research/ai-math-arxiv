@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-06T00:55:05+00:00",
-  "pipeline_commit": "46962c3fd6f54da63dfb9d41a20fae7694c8fe50",
+  "generated_at": "2026-11-09T03:34:12+00:00",
+  "pipeline_commit": "da7049e542e5caf6ed212ed1f3b004cce03ec3ab",
   "classification": {
     "provenance": "fulltext:ai_tools.v3:tax5:sol+fable",
     "classification_version": "v5",
@@ -8,15 +8,16 @@
       "gpt-5.6-sol"
     ],
     "second_reader": "claude-fable-5",
-    "verdicts": 19244,
+    "verdicts": 24276,
     "errored_verdicts": 0,
-    "reread_papers": 4823,
+    "reread_papers": 7962,
     "series_threshold": 0.1,
     "series_under_threshold": [
       "code_computation",
       "draft_text_generated",
       "figures_media",
       "literature_search",
+      "purpose_unstated",
       "translation",
       "writing_polish"
     ],
@@ -24,33 +25,42 @@
       "code_computation": "code_computation",
       "draft_text_generated": "writing",
       "literature_search": "lit_review",
+      "purpose_unstated": "unspecified",
       "translation": "writing",
       "writing_polish": "writing"
     },
     "series_qc": {
       "code_computation": {
-        "pairs": 1837,
-        "unsupported": 96
+        "pairs": 2931,
+        "unsupported": 153
       },
       "draft_text_generated": {
-        "pairs": 785,
-        "unsupported": 33
+        "pairs": 1287,
+        "unsupported": 52
       },
       "figures_media": {
-        "pairs": 468,
-        "unsupported": 7
+        "pairs": 853,
+        "unsupported": 9
       },
       "literature_search": {
-        "pairs": 1335,
-        "unsupported": 105
+        "pairs": 2389,
+        "unsupported": 207
       },
       "math_checking": {
-        "pairs": 2041,
-        "unsupported": 118
+        "pairs": 3606,
+        "unsupported": 171
       },
       "name_collision": {
-        "pairs": 5915,
-        "unsupported": 99
+        "pairs": 6099,
+        "unsupported": 107
+      },
+      "new:experiment_design": {
+        "pairs": 2,
+        "unsupported": 0
+      },
+      "new:experimental_model_evaluation": {
+        "pairs": 1,
+        "unsupported": 0
       },
       "new:model_evaluation": {
         "pairs": 2,
@@ -61,32 +71,32 @@
         "unsupported": 0
       },
       "no_use_declared": {
-        "pairs": 402,
-        "unsupported": 9
+        "pairs": 694,
+        "unsupported": 12
       },
       "other": {
-        "pairs": 615,
-        "unsupported": 344
+        "pairs": 888,
+        "unsupported": 489
       },
       "passing_mention": {
-        "pairs": 3001,
-        "unsupported": 312
+        "pairs": 3316,
+        "unsupported": 340
       },
       "purpose_unstated": {
-        "pairs": 206,
-        "unsupported": 21
+        "pairs": 308,
+        "unsupported": 25
       },
       "subject_matter": {
-        "pairs": 1835,
-        "unsupported": 177
+        "pairs": 1950,
+        "unsupported": 186
       },
       "translation": {
-        "pairs": 89,
+        "pairs": 140,
         "unsupported": 5
       },
       "writing_polish": {
-        "pairs": 4744,
-        "unsupported": 120
+        "pairs": 7872,
+        "unsupported": 178
       }
     }
   },
@@ -116,22 +126,22 @@
       "total_adopted_rate"
     ],
     "from": "2023-01",
-    "through": "2026-10"
+    "through": "2026-11"
   },
   "disclosures": {
     "from": "2023-01",
-    "through": "2026-09",
-    "papers_examined": 160669,
-    "papers_disclosing": 7141,
-    "tools_listed": 10410,
-    "tools_dropped_unverified_receipt": 29,
+    "through": "2026-10",
+    "papers_examined": 169446,
+    "papers_disclosing": 11402,
+    "tools_listed": 16493,
+    "tools_dropped_unverified_receipt": 37,
     "outcomes": {
-      "no_hit": 141427,
-      "no_disclosure": 10117,
-      "disclosure": 7141,
-      "not_examined": 2519,
-      "subject_matter": 1622,
-      "denial": 362
+      "no_hit": 145191,
+      "disclosure": 11402,
+      "no_disclosure": 10531,
+      "not_examined": 2709,
+      "subject_matter": 1673,
+      "denial": 649
     },
     "partial_months": []
   },
@@ -144,23 +154,23 @@
   "files": {
     "monthly": {
       "path": "arxiv_trends_monthly.csv",
-      "rows": 75276
+      "rows": 87438
     },
     "disclosures": {
       "path": "math_disclosures.csv",
-      "rows": 16786
+      "rows": 28135
     },
     "examined": {
       "path": "math_examined.csv",
-      "rows": 1395
+      "rows": 1426
     },
     "papers": {
       "path": "math_papers.csv.gz",
-      "rows": 163188
+      "rows": 172155
     },
     "tools": {
       "path": "math_tools.csv",
-      "rows": 10410
+      "rows": 16493
     }
   }
 }
